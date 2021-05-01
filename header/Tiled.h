@@ -7,10 +7,6 @@
 
 #include "JSONParser.h"
 
-typedef unsigned int u_int;
-typedef unsigned short u_short;
-typedef unsigned char u_char;
-
 typedef enum Object_Layer_Type {
     BOUNDS,
     TELEPORTS
@@ -50,10 +46,12 @@ typedef struct Tile_Map {
  * Populates a new Tile_Map type from JSON data received. This function allocates
  * memory and must be either freed manually or by calling #tiled_free
  * @param root root entry in the JSON Data linked list
- * @param print_result whether or not to printf the resulting structure
  * @return a Tile_Map struct allocated on the heap.
  */
-Tile_Map *tiled_populate_from_json(JSON_Data *root, unsigned char print_result);
+Tile_Map *tiled_populate_from_json(JSON_Data *root);
+
+void tiled_print_map(Tile_Map *map);
+
 /**
  * Frees all the allocated memory in linked list passed in.
  * @param tm tm entry of linked list

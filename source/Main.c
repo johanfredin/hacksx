@@ -55,8 +55,8 @@ void map_init(u_char level) {
     assets_count = set_level_assets(level);
 
     frames = calloc(7, sizeof(Frame));
-    init_frame(&frames[0], "01BG.TIM", "01FG.TIM", "RAICHU.TIM", "C:\\Users\\lowrider\\CLionProjects\\badjson\\res\\0_0.JSON");
-    init_frame(&frames[1], "00BG.TIM", "00FG.TIM", "PSYDUCK.TIM", "C:\\Users\\lowrider\\CLionProjects\\badjson\\res\\1_0.JSON");
+    init_frame(&frames[0], "01BG.TIM", "01FG.TIM", "RAICHU.TIM", "C:\\Users\\lowrider\\CLionProjects\\hacksx\\res\\0_0.JSON");
+//    init_frame(&frames[1], "00BG.TIM", "00FG.TIM", "PSYDUCK.TIM", "C:\\Users\\lowrider\\CLionProjects\\hacksx\\res\\1_0.JSON");
     // init_frame(&frames[frame_cnt++], "11BG.TIM", "11FG.TIM", "ALOLA.TIM", "1_1.JSON");
     // init_smaller_frame(&frames[frame_cnt++], "YOLOBG.TIM", "YOLOFG.TIM", "100I0.JSON", 256 / 4, 256 / 4);
     // init_smaller_frame(&frames[frame_cnt++], "1_TUNNEL.TIM", NULL, "1_TUN.JSON", 0, 256 / 3);
@@ -75,8 +75,8 @@ u_char set_level_assets(u_char level) {
     printf("ADDING ASSETS FOR LEVEL\n");
     if (level == 1) {
         cdr_data_assets = calloc(24, sizeof(CdrData));
-        cdr_data_assets[asset_cnt++] = cdr_read_file("C:\\Users\\lowrider\\CLionProjects\\badjson\\res\\0_0.JSON");
-        cdr_data_assets[asset_cnt++] = cdr_read_file("C:\\Users\\lowrider\\CLionProjects\\badjson\\res\\1_0.JSON");
+        cdr_data_assets[asset_cnt++] = cdr_read_file("C:\\Users\\lowrider\\CLionProjects\\hacksx\\res\\0_0.JSON");
+//        cdr_data_assets[asset_cnt++] = cdr_read_file("C:\\Users\\lowrider\\CLionProjects\\hacksx\\res\\1_0.JSON");
         // cdr_data_assets[asset_cnt++] = cdr_read_file("1_0.JSON");
         // cdr_data_assets[asset_cnt++] = cdr_read_file("1_1.JSON");
         // cdr_data_assets[asset_cnt++] = cdr_read_file("1_TUN.JSON");
@@ -88,10 +88,7 @@ u_char set_level_assets(u_char level) {
 
 void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_file) {
     // Declarations --------------------------
-    CdrData *bg_cdr_data;
-    CdrData *fg_cdr_data;
     char *content;
-    CdrData *gobj_cdr_data;
     CdrData *json_cdr_data;
     JSON_Data *map_data;
     Tile_Map *tile_map;
@@ -106,23 +103,12 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     frame->bg = NULL;
     frame->fg = NULL;
 
-    // bg_cdr_data = cdr_find_data_entry(bg, cdr_data_assets, assets_count);
-    // frame->bg = asmg_load_sprite(bg_cdr_data, 0, 0, 128, COLOR_BITS_8); // BG can not be NULL so no check
-    // if (fg != NULL) {
-    //     fg_cdr_data = cdr_find_data_entry(fg, cdr_data_assets, assets_count);
-    //     frame->fg = asmg_load_sprite(fg_cdr_data, 0, 0, 128, COLOR_BITS_8);
-    // }
-    // if (gobj != NULL) {
-    //     gobj_cdr_data = cdr_find_data_entry(gobj, cdr_data_assets, assets_count);
-    //     frame->game_object = gobj_init(asmg_load_sprite(gobj_cdr_data, 90, 120, 128, COLOR_BITS_8), 16, 16, 2, 3, 100, GOBJ_TYPE_NPC);
-    // }
-
-
     // Parse json file into tile map
     json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
     content = json_cdr_data->file;
-    map_data = parser_parse(content, 0);
-    tile_map = tiled_populate_from_json(map_data, 1);
+    map_data = jsonp_parse(content);
+    jsonp_print_data(map_data);
+    tile_map = tiled_populate_from_json(map_data);
 
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
@@ -154,7 +140,7 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     frame->teleports = teleports;
 
     // Housekeeping
-     parser_free(map_data);
+     jsonp_free(map_data);
      tiled_free(tile_map);
 }
 
@@ -200,7 +186,7 @@ CdrData *cdr_read_file(char *fileName) {
 
 RECT get_rect(u_short x, u_short y, u_short w, u_short h) {
     RECT r = {x, y, w, h};
-//    printf("Coords assigned at {x:%d, y%d, w:%d, h:%d}\n", r.x, r.y, r.w, r.h);
+    logr_log(TRACE, "TRACE - Coords assigned at {x:%d, y%d, w:%d, h:%d}", r.x, r.y, r.w, r.h);
     return r;
 }
 

@@ -1,8 +1,7 @@
 //
 // Created by lowrider on 2021-03-28.
 //
-#include <string.h>
-#include <stdlib.h>
+#include <vcruntime_string.h>
 #include <stdio.h>
 #include "../header/JSONParser.h"
 
@@ -10,34 +9,38 @@ unsigned int idx;
 char *content = NULL;
 
 void get_value(JSON_Data *);
-void get_str(JSON_Data *entry, unsigned char type);
+void get_str(JSON_Data *entry, u_char type);
 void get_array(JSON_Data *);
 void get_object(JSON_Data *);
 void get_number(JSON_Data *);
 void get_bool(JSON_Data *);
-void print_json_data(JSON_Data *root);
 void print_recursive(JSON_Data *root, int indents);
 void ff_to_start();
 JSON_Data *malloc_json_entry();
 char skip_irrelevant_chars();
 char *get_numeric_str();
-char *read_until(char end_char, unsigned char include_end_char);
+char *read_until(char end_char, u_char include_end_char);
 char curr_ch();
 char next_ch();
-unsigned char is_num();
+u_char is_num();
 
-JSON_Data *parser_parse(char *file_content, unsigned char print_result) {
+JSON_Data *jsonp_parse(char *file_content) {
     // Calc length of content
     JSON_Data *root, *curr;
     int content_length = 0;
 
-    STR_LEN(content_length, file_content);
+    // Set idx to 0 in this function so that it resets in case we need to parse several json files
+    idx = 0;
+
+    SET_STR_LEN(content_length, file_content);
 
     content = file_content;
     root = malloc_json_entry();
     curr = root;
     ff_to_start();
     while (idx < content_length) {
+        u_int next_idx;
+        char next_char;
         skip_irrelevant_chars();
 
         get_str(curr, 'k');
@@ -46,9 +49,9 @@ JSON_Data *parser_parse(char *file_content, unsigned char print_result) {
         skip_irrelevant_chars();
 
         // Go to next if we have not reached the end yet
-        unsigned int nextIdx = idx + 1;
-        char nextChar = content[nextIdx];
-        if (nextIdx >= content_length || nextChar == '\0' || (nextChar == '}' && content[++nextIdx] == '\0')) {
+        next_idx = idx + 1;
+        next_char = content[next_idx];
+        if (next_idx >= content_length || next_char == '\0' || (next_char == '}' && content[++next_idx] == '\0')) {
             break;
         }
         curr->next = malloc_json_entry();
@@ -56,37 +59,34 @@ JSON_Data *parser_parse(char *file_content, unsigned char print_result) {
         skip_irrelevant_chars();
         idx++;
     }
-    if (print_result) {
-        print_json_data(root);
-    }
-    idx = 0;
+
     return root;
 }
 
-void print_json_data(JSON_Data *root) {
+void jsonp_print_data(JSON_Data *root) {
     printf("{\n");
     print_recursive(root, 2);
     printf("}");
 }
 
-void parser_free(JSON_Data *root) {
+void jsonp_free(JSON_Data *root) {
     JSON_Data *curr = root;
-    unsigned char is_nested;
-    while(curr != NULL) {
-        JSON_Data* aux;
+    u_char is_nested;
+    while (curr != NULL) {
+        JSON_Data *aux;
         is_nested = curr->type.arr | curr->type.obj;
         if (is_nested) {
-            parser_free((JSON_Data *) curr->value);
+            jsonp_free((JSON_Data *)curr->value);
         }
         aux = curr;
         curr = curr->next;
-        if(is_nested) {
+        if (is_nested) {
             aux->value = NULL;
         } else {
-            FREE_AND_NULL(aux->value);
+            MEM_FREE_3_AND_NULL(aux->value);
         }
-        FREE_AND_NULL(aux->key);
-        FREE_AND_NULL(aux);
+        MEM_FREE_3_AND_NULL(aux->key);
+        MEM_FREE_3_AND_NULL(aux);
     }
 }
 
@@ -112,7 +112,7 @@ void print_recursive(JSON_Data *root, int indents) {
             printf("%.2f%s\n", *((float *) curr->value), comma);
         } else if (curr->type.integer) {
             printf("%i%s\n", *((int *) curr->value), comma);
-        } else if (curr->type.bool) {
+        } else if (curr->type.boolean) {
             printf("%s%s\n", *((unsigned char *) curr->value) == 1 ? "true" : "false", comma);
         } else if (curr->type.arr) {
             printf("[\n");
@@ -149,18 +149,19 @@ void get_value(JSON_Data *entry) {
     }
 }
 
-void get_str(JSON_Data *entry, unsigned char type) {
+void get_str(JSON_Data *entry, u_char type) {
+    char *str = NULL;
     if (curr_ch() == '\"') {
         next_ch();
     }
-    char *str = read_until('\"', 0);
+    str = read_until('\"', 0);
     if (type == 'k') {
         entry->key = str;
     } else if (type == 'v') {
         entry->value = str;
         entry->type.str = 1;
     } else {
-        printf("ERR, value=%c not one of 'k', 'v'\n", type);
+        logr_log(ERROR, "ERROR - value=%c not one of 'k', 'v'\n", type);
         exit(1);
     }
 }
@@ -170,27 +171,28 @@ void get_number(JSON_Data *entry) {
     float *f_ptr;
     int *i_ptr;
     if (strchr(num_str, '.')) {
-        f_ptr = malloc(sizeof(float));
-        *f_ptr = strtof(num_str, NULL);
-        entry->value = f_ptr;
-        entry->type.decimal = 1;
+        logr_log(TRACE, "WARN - Floating point not implemented for ps1 and will not be parsed, key=%s", entry->key);
+        // f_ptr = malloc(sizeof(float));
+        // *f_ptr = strtof(num_str, NULL);
+        // entry->value = f_ptr;
+        // entry->type.decimal = 1;
     } else {
-        i_ptr = malloc(sizeof(int));
+        i_ptr = MEM_MALLOC_3(int);
         *i_ptr = (int) strtol(num_str, NULL, 10);
         entry->value = i_ptr;
         entry->type.integer = 1;
     }
-    free(num_str);
+    MEM_FREE_3_AND_NULL(num_str);
 }
 
 void get_bool(JSON_Data *entry) {
-    char *str_bool = read_until('e', 1);   // true and false both end at 'e'
-    unsigned char *bool_ptr = malloc(sizeof(unsigned char));
-    *bool_ptr = strcmp(str_bool, "true") == 0 ? 1 : 0;
-    free(str_bool);
+    char *str_bool = read_until('e', 1); // true and false both end at 'e'
+    u_char *bool_ptr = MEM_MALLOC_3(u_char);
+    *bool_ptr = STREQ(str_bool, "true");
+    MEM_FREE_3_AND_NULL(str_bool);
     str_bool = NULL;
     entry->value = bool_ptr;
-    entry->type.bool = 1;
+    entry->type.boolean = 1;
 }
 
 void get_array(JSON_Data *entry) {
@@ -243,7 +245,7 @@ void get_object(JSON_Data *entry) {
 
 JSON_Data *malloc_json_entry() {
     Type zeroType = {0, 0, 0, 0, 0, 0};
-    JSON_Data *data = malloc(sizeof(JSON_Data));
+    JSON_Data *data = MEM_MALLOC_3(JSON_Data);
     data->key = NULL;
     data->value = NULL;
     data->next = NULL;
@@ -251,18 +253,18 @@ JSON_Data *malloc_json_entry() {
     return data;
 }
 
-char *read_until(char end_char, unsigned char include_end_char) {
-    const unsigned char size = 100;
-    char *str = calloc(size, sizeof(char));
+char *read_until(char end_char, u_char include_end_char) {
+    const u_char size = 100;
+    char *str = MEM_CALLOC_3(size, char);
 
-    unsigned char i = 0;
+    u_char i = 0;
     char c = curr_ch();
     while (c != end_char) {
         str[i] = c;
         c = next_ch();
 
         if (i >= size) {
-            printf("ERROR: String exceeded max length of %i, accumulated string=%s\n", size, str);
+            logr_log(ERROR, "ERROR: String exceeded max length of %i, accumulated string=%s\n", size, str);
             exit(1);
         }
 
@@ -278,14 +280,14 @@ char *read_until(char end_char, unsigned char include_end_char) {
 }
 
 char *get_numeric_str() {
-    const unsigned char size = 15;
-    unsigned char i = 0;
-    char *str = calloc(size, sizeof(char));
+    const u_char size = 15;
+    u_char i = 0;
+    char *str = MEM_CALLOC_3(size, char);
     while (is_num()) {
         str[i] = curr_ch();
         next_ch();
         if (i >= size) {
-            printf("ERROR: Numeric string exceeded max length of %i, accumulated string=%s\n", size, str);
+            logr_log(ERROR, "ERROR: Numeric string exceeded max length of %i, accumulated string=%s\n", size, str);
             exit(1);
         }
         i++;
@@ -294,9 +296,9 @@ char *get_numeric_str() {
     return str;
 }
 
-unsigned char is_num() {
+u_char is_num() {
     char c = curr_ch();
-    unsigned char i;
+    u_char i;
     char numbers[] = "0123456789.\0";
     for (i = 0; numbers[i] != '\0'; i++) {
         if (numbers[i] == c) {

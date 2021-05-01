@@ -6,12 +6,17 @@
 #define PSX_SPIKE_PARSER_H
 
 #include "Utils.h"
+#include <stdlib.h>
+#include "StrUtils.h"
+#include "MemUtils.h"
+#include "Logger.h"
+#include "Types.h"
 
 typedef struct {
     unsigned char integer: 1;
     unsigned char decimal: 1;
     unsigned char str: 1;
-    unsigned char bool: 1;
+    unsigned char boolean: 1;
     unsigned char arr: 1;
     unsigned char obj: 1;
 } Type;

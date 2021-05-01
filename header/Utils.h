@@ -6,7 +6,7 @@
 #define BADJSON_UTILS_H
 
 #define STREQ(str1, str2) strcmp(str1, str2) == 0
-#define STR_LEN(i, str) while ((char) str[i] != '\0') i++
+#define SET_STR_LEN(i, str) while ((char) str[i] != '\0') i++
 #define FREE_AND_NULL(ptr) if(ptr != NULL) free(ptr); ptr = NULL
 
 #define FREE_LINKED_LIST(linked_list_root, T)   \
