@@ -52,9 +52,7 @@ Mkfile.old
 dkms.conf
 
 *.idea
-cmake-build-debug/CMakeFiles
-cmake-build-debug/badjson
-cmake-build-debug/Testing
+cmake-build-debug
 *.exe
 *.ilk
 *.pdb

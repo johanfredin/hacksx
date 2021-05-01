@@ -4,7 +4,7 @@
 
 #include <malloc.h>
 #include <stdlib.h>
-#include "filereader.h"
+#include "../header/filereader.h"
 
 FILE *fr_get_file(const char *fileName) {
     FILE *file;

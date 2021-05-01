@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "parser.h"
+#include "../header/parser.h"
 
 unsigned int idx;
 char *content = NULL;

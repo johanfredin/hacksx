@@ -1,8 +1,8 @@
 #include <malloc.h>
 #include <stdlib.h>
-#include "parser.h"
-#include "filereader.h"
-#include "tiled.h"
+#include "../header/parser.h"
+#include "../header/filereader.h"
+#include "../header/tiled.h"
 #include "string.h"
 
 typedef unsigned long u_long;
