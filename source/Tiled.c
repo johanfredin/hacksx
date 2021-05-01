@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../header/tiled.h"
+#include "../header/Tiled.h"
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);

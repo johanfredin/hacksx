@@ -5,7 +5,7 @@
 #ifndef PSX_SPIKE_PARSER_H
 #define PSX_SPIKE_PARSER_H
 
-#include "utils.h"
+#include "Utils.h"
 
 typedef struct {
     unsigned char integer: 1;
@@ -23,7 +23,8 @@ typedef struct JSON_Data {
     struct JSON_Data *next;
 } JSON_Data;
 
-JSON_Data *parser_parse(char *file_content, unsigned char print_result);
-void parser_free(JSON_Data *root);
+JSON_Data *jsonp_parse(char *file_content);
+void jsonp_print_data(JSON_Data *root);
+void jsonp_free(JSON_Data *root);
 
 #endif //PSX_SPIKE_PARSER_H

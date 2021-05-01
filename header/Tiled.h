@@ -5,7 +5,7 @@
 #ifndef PSX_SPIKE_TILED_H
 #define PSX_SPIKE_TILED_H
 
-#include "parser.h"
+#include "JSONParser.h"
 
 typedef unsigned int u_int;
 typedef unsigned short u_short;

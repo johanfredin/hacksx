@@ -4,7 +4,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "../header/parser.h"
+#include "../header/JSONParser.h"
 
 unsigned int idx;
 char *content = NULL;
