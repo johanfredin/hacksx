@@ -92,7 +92,8 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     CdrData *json_cdr_data;
     JSON_Data *map_data;
     Tile_Map *tile_map;
-    Object_Layer *root, *curr;
+    ObjectLayer_Bounds *curr_b;
+    ObjectLayer_Teleport *curr_t;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     u_char blocks_cnt;
@@ -114,9 +115,8 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     blocks_cnt = tile_map->bounds_cnt;
     collision_blocks = malloc(sizeof(CollisionBlock));
     collision_blocks->bounds = calloc(blocks_cnt, sizeof(RECT));
-    root = tile_map->bounds;
-    for (i = 0, curr = root; curr != NULL; i++, curr = curr->next) {
-        collision_blocks->bounds[i] = get_rect(curr->x, curr->y, curr->width, curr->height);
+    for (i = 0, curr_b = tile_map->bounds; curr_b != NULL; i++, curr_b = curr_b->next) {
+        collision_blocks->bounds[i] = get_rect(curr_b->x, curr_b->y, curr_b->width, curr_b->height);
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
@@ -124,11 +124,9 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     // Init teleports
     teleports_cnt = tile_map->teleports_cnt;
     teleports = calloc(teleports_cnt, sizeof(Teleport));
-    root = tile_map->teleports;
+    for (i = 0, curr_t = tile_map->teleports; curr_t != NULL; i++, curr_t = curr_t->next) {
 
-    for (i = 0, curr = root; curr != NULL; i++, curr = curr->next) {
-
-        teleports[i].origin = get_rect(curr->x, curr->y, curr->width, curr->height);
+        teleports[i].origin = get_rect(curr_t->x, curr_t->y, curr_t->width, curr_t->height);
 
         // Replace with real values once json parser updated
         teleports[i].dest_x = 126;

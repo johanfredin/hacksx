@@ -6,7 +6,8 @@
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);
-void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root, Object_Layer_Type type);
+void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root);
+void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root);
 
 Tile_Map *tiled_populate_from_json(JSON_Data *root) {
     JSON_Data *curr;
@@ -32,7 +33,6 @@ Tile_Map *tiled_populate_from_json(JSON_Data *root) {
             add_tile_layers_to_map(tm, (JSON_Data *) value);
         }
     }
-
     return tm;
 }
 
@@ -46,15 +46,15 @@ void tiled_free(Tile_Map *tm) {
         MEM_FREE_LINKED_LIST(aux->data, Layer_Data);
         MEM_FREE_3_AND_NULL(aux);
     }
-    MEM_FREE_LINKED_LIST(tm->bounds, Object_Layer);
-    MEM_FREE_LINKED_LIST(tm->teleports, Object_Layer);
+    MEM_FREE_LINKED_LIST(tm->bounds, ObjectLayer_Bounds);
+    MEM_FREE_LINKED_LIST(tm->teleports, ObjectLayer_Teleport);
     MEM_FREE_3_AND_NULL(tm);
 }
 
-
 void tiled_print_map(Tile_Map *map) {
     Tile_Layer *tile_layer;
-    Object_Layer *bounds_layer, *teleports_layer;
+    ObjectLayer_Bounds *bounds_layer;
+    ObjectLayer_Teleport *teleports_layer;
     logr_log(INFO, "Map parsed from JSON");
     logr_log(INFO, "-------------------- ");
     logr_log(INFO, "Bounds cnt=%d", map->bounds_cnt);
@@ -133,16 +133,17 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
                     while (!(STREQ(curr_layer->key, "objects"))) {
                         curr_layer = curr_layer->next;
                     }
-                    // Value should now be at objects root
-                    value = curr_layer->value;  // Sync
-                    add_object_layers_to_map(
-                            tm,
-                            (JSON_Data *) value,
-                            is_bounds ? BOUNDS : TELEPORTS
-                    );
+                }
+                // Value should now be at objects root
+                value = curr_layer->value;  // Sync
+                if (is_bounds) {
+                    add_object_layers_to_map(tm, (JSON_Data *) value);
                     MEM_FREE_3_AND_NULL(tl_curr);
                     tl_curr = tl_prev;
-
+                } else if(is_teleports) {
+                    add_teleport_layers_to_map(tm, (JSON_Data *) value);
+                    MEM_FREE_3_AND_NULL(tl_curr);
+                    tl_curr = tl_prev;
                 } else {
                     tl_curr->name = (char *) value;
                 }
@@ -169,13 +170,14 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
     tm->layers = tl_root;
 }
 
-void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root, Object_Layer_Type type) {
+void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     u_char objects_cnt;
-    Object_Layer *ol_root, *ol_curr; // Our object layers linked list
+    ObjectLayer_Bounds *ol_root, *ol_curr; // Our object layers linked list
     JSON_Data *curr_obj_layer; // Our current json object being iterated
-    ol_root = MEM_MALLOC_3(Object_Layer);
+    ol_root = MEM_MALLOC_3(ObjectLayer_Bounds);
     ol_curr = ol_root;
-    for (curr_obj_layer = root, objects_cnt = 0; curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
+    for (curr_obj_layer = root, objects_cnt = 0;
+         curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
         JSON_Data *entry_root = (JSON_Data *) curr_obj_layer->value;
         JSON_Data *entry_curr;
         for (entry_curr = entry_root; entry_curr != NULL; entry_curr = entry_curr->next) { // Iterate object properties
@@ -196,16 +198,44 @@ void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root, Object_Layer_Type t
                 ol_curr->y = *(u_int *) value;
             }
         }
-        MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(curr_obj_layer, ol_curr, Object_Layer)
+        MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(curr_obj_layer, ol_curr, ObjectLayer_Bounds)
     }
+    tm->bounds = ol_root;
+    tm->bounds_cnt = objects_cnt;
+}
 
-    if (type == BOUNDS) {
-        tm->bounds = ol_root;
-        tm->bounds_cnt = objects_cnt;
-    } else {
-        tm->teleports = ol_root;
-        tm->teleports_cnt = objects_cnt;
+void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
+    u_char objects_cnt;
+    ObjectLayer_Teleport *ol_root, *ol_curr; // Our object layers linked list
+    JSON_Data *curr_obj_layer; // Our current json object being iterated
+    ol_root = MEM_MALLOC_3(ObjectLayer_Teleport);
+    ol_curr = ol_root;
+    for (curr_obj_layer = root, objects_cnt = 0;
+         curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
+        JSON_Data *entry_root = (JSON_Data *) curr_obj_layer->value;
+        JSON_Data *entry_curr;
+        for (entry_curr = entry_root; entry_curr != NULL; entry_curr = entry_curr->next) { // Iterate object properties
+            char *key = entry_curr->key;
+            void *value = entry_curr->value;
+
+            if (STREQ(key, "height")) {
+                ol_curr->height = *(u_int *) value;
+            } else if (STREQ(key, "id")) {
+                ol_curr->id = *(u_int *) value;
+            } else if (STREQ(key, "visible")) {
+                ol_curr->visible = *(u_char *) value;
+            } else if (STREQ(key, "width")) {
+                ol_curr->width = *(u_int *) value;
+            } else if (STREQ(key, "x")) {
+                ol_curr->x = *(u_int *) value;
+            } else if (STREQ(key, "y")) {
+                ol_curr->y = *(u_int *) value;
+            }
+        }
+        MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(curr_obj_layer, ol_curr, ObjectLayer_Teleport)
     }
+    tm->teleports = ol_root;
+    tm->teleports_cnt = objects_cnt;
 }
 
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root) {

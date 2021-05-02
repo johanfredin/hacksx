@@ -12,13 +12,23 @@ typedef enum Object_Layer_Type {
     TELEPORTS
 } Object_Layer_Type;
 
-typedef struct Object_Layer {
+typedef struct ObjectLayer_Bounds {
     u_int width, height;
     u_int id;
     u_char visible;
     u_int x, y;
-    struct Object_Layer *next;
-} Object_Layer;
+    struct ObjectLayer_Bounds *next;
+} ObjectLayer_Bounds;
+
+typedef struct ObjectLayer_Teleport {
+    u_int width, height;
+    u_int id;
+    u_char visible;
+    u_int x, y, dest_x, dest_y;
+    u_char dest_frame;
+    struct ObjectLayer_Teleport *next;
+} ObjectLayer_Teleport;
+
 
 typedef struct Layer_Data {
     u_short id;
@@ -37,7 +47,8 @@ typedef struct Tile_Layer {
 typedef struct Tile_Map {
     int width, height, tile_width, tile_height;
     Tile_Layer *layers;
-    Object_Layer *bounds, *teleports;
+    ObjectLayer_Bounds *bounds;
+    ObjectLayer_Teleport *teleports;
     u_char bounds_cnt;
     u_char teleports_cnt;
 } Tile_Map;
