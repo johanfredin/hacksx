@@ -12,6 +12,7 @@ typedef enum Object_Layer_Type {
     TELEPORTS
 } Object_Layer_Type;
 
+
 typedef struct ObjectLayer_Bounds {
     u_int width, height;
     u_int id;

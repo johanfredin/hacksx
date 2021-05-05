@@ -101,6 +101,9 @@ void tiled_print_map(Tile_Map *map) {
         logr_log(INFO, "      width=%d ", teleports_layer->width);
         logr_log(INFO, "      height=%d ", teleports_layer->height);
         logr_log(INFO, "      visible=%d ", teleports_layer->visible);
+        logr_log(INFO, "      dest_frame=%d ", teleports_layer->dest_frame);
+        logr_log(INFO, "      dest_x=%d ", teleports_layer->dest_x);
+        logr_log(INFO, "      dest_y=%d ", teleports_layer->dest_y);
         logr_log(INFO, "    } ");
     }
     logr_log(INFO, "  ] ");
@@ -140,7 +143,7 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
                     add_object_layers_to_map(tm, (JSON_Data *) value);
                     MEM_FREE_3_AND_NULL(tl_curr);
                     tl_curr = tl_prev;
-                } else if(is_teleports) {
+                } else if (is_teleports) {
                     add_teleport_layers_to_map(tm, (JSON_Data *) value);
                     MEM_FREE_3_AND_NULL(tl_curr);
                     tl_curr = tl_prev;
@@ -211,7 +214,7 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     ol_root = MEM_MALLOC_3(ObjectLayer_Teleport);
     ol_curr = ol_root;
     for (curr_obj_layer = root, objects_cnt = 0;
-         curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
+        curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
         JSON_Data *entry_root = (JSON_Data *) curr_obj_layer->value;
         JSON_Data *entry_curr;
         for (entry_curr = entry_root; entry_curr != NULL; entry_curr = entry_curr->next) { // Iterate object properties
@@ -230,6 +233,22 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
                 ol_curr->x = *(u_int *) value;
             } else if (STREQ(key, "y")) {
                 ol_curr->y = *(u_int *) value;
+            } else if (STREQ(key, "properties")) {
+                JSON_Data *props_root = (JSON_Data *) entry_curr->value;
+                JSON_Data *props_curr;
+                for (props_curr = props_root; props_curr != NULL; props_curr = props_curr->next) {
+                    JSON_Data *teleport_property_obj = (JSON_Data *) props_curr->value;
+                    char *prop_name = (char*) teleport_property_obj->value;
+                    int prop_value = *(int*) teleport_property_obj->next->next->value;
+                    if(STREQ(prop_name, "dest_frame")) {
+                        ol_curr->dest_frame = prop_value;
+                    } else if(STREQ(prop_name, "dest_x")) {
+                        ol_curr->dest_x = prop_value;
+                    } else if(STREQ(prop_name, "dest_y")) {
+                        ol_curr->dest_y = prop_value;
+                    }
+                    logr_log(INFO, "Yolo");
+                }
             }
         }
         MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(curr_obj_layer, ol_curr, ObjectLayer_Teleport)

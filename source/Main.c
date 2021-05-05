@@ -108,9 +108,9 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
     content = json_cdr_data->file;
     map_data = jsonp_parse(content);
-    jsonp_print_data(map_data);
+//    jsonp_print_data(map_data);
     tile_map = tiled_populate_from_json(map_data);
-
+    tiled_print_map(tile_map);
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
     collision_blocks = malloc(sizeof(CollisionBlock));
