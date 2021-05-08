@@ -2,7 +2,9 @@
 #define PSX_GRIDMAP_H
 
 #include "CdReader.h"
+#include "AssetManager.h"
 #include "JSONParser.h"
+#include "GameObject.h"
 #include "Tiled.h"
 #include "GPUBase.h"
 

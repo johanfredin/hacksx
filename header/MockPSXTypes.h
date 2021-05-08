@@ -7,16 +7,31 @@
 #ifndef HACKSX_MOCKPSXTYPES_H
 #define HACKSX_MOCKPSXTYPES_H
 
-#define FntPrint(c, args) \
-logr_log(INFO, c, args)
-
 #define DrawPrim(tile) \
 logr_log(INFO, "Drawing Primes")
+
+#define GsSortFastSprite(sprite, ot, prio) \
+logr_log(INFO, "Drawing Sprite")
+
+#define SetTile(tile) \
+logr_log(INFO, "Setting Tile")
+
+#define setRGB0(object, r, g, b) \
+logr_log(INFO, "Setting rgb")
+
+#define PADLdown 0
+#define PADLup 1
+#define PADLright 2
+#define PADLleft 3
+#define PADselect 4
 
 typedef unsigned char u_char;
 typedef unsigned long u_long;
 typedef unsigned short u_short;
 typedef unsigned int u_int;
+
+void FntPrint(char *c, ...);
+u_long PadRead(u_long btn);
 
 typedef struct {
     short x, y;        /* offset point on VRAM */
@@ -31,7 +46,7 @@ typedef struct {
 
 typedef struct {
     unsigned long attribute;
-    short x, y;
+    short x, y, u, v;
     unsigned short w, h;
     long rotate;
 } GsSPRITE;

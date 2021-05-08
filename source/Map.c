@@ -113,7 +113,7 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
 
     // Parse json file into tile map
     json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
-    content = json_cdr_data->file;
+    content = (u_long *) json_cdr_data->file;
     map_data = jsonp_parse((char *)content);
     tile_map = tiled_populate_from_json(map_data);
     // tiled_print_map(tile_map);
@@ -139,8 +139,8 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
 
         teleports[i].origin = get_rect(curr_t->x, curr_t->y, curr_t->width, curr_t->height);
         
-        teleports[i].dest_x = (curr_t->dest_x == NULL) ? -1 : curr_t->dest_x;
-        teleports[i].dest_y = (curr_t->dest_y == NULL) ? -1 : curr_t->dest_y;
+        teleports[i].dest_x = (curr_t->dest_x == 0) ? -1 : curr_t->dest_x;
+        teleports[i].dest_y = (curr_t->dest_y == 0) ? -1 : curr_t->dest_y;
         teleports[i].dest_frame = curr_t->dest_frame;
 
         if(GPUB_DRAW_BOUNDS) {

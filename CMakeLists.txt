@@ -16,6 +16,8 @@ add_executable(hacksx
         header/StrUtils.h
         header/MockPSXTypes.h
         header/GPUBase.h
+        header/GameObject.h
+        header/AssetManager.h
         source/CdReader.c
         source/Map.c
         source/FileReader.c
@@ -23,4 +25,6 @@ add_executable(hacksx
         source/JSONParser.c
         source/Tiled.c
         source/GPUBase.c
-        source/Logger.c )
+        source/GameObject.c
+        source/AssetManager.c
+        source/Logger.c source/MockPSXTypes.c)

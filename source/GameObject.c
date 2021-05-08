@@ -40,7 +40,6 @@ void gobj_draw(GameObject *game_object) {
 void gobj_tick(GameObject *game_object, Player *player) {
     game_object->sprite->x += game_object->x_speed;
     game_object->sprite->y += game_object->y_speed;
-    return;
 }
 
 void set_heading(GameObject *gobj, u_char l, u_char r, u_char u, u_char d) {
