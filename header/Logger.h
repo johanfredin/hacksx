@@ -2,6 +2,7 @@
 #define PSX_LOGGER_H
 
 #include <stdarg.h>
+#include <stdio.h>
 
 #define ERROR 0
 #define WARN 1

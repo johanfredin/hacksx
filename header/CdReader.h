@@ -1,22 +1,10 @@
-/**
- * Helper lib for streaming data from the cd rom
- * Originally created by wituz
- * 
- */
-
 #ifndef PSX_CD_READER_H
 #define PSX_CD_READER_H
 
-#include <sys/types.h>
-#include <LIBDS.H>
-#include <stdlib.h>
-#include <string.h>
-
+#include "MockPSXTypes.h"
 #include "Logger.h"
 #include "MemUtils.h"
 #include "StrUtils.h"
-
-#define SECTOR 2048
 
 typedef struct {
     char *name;

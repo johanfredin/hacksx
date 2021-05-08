@@ -2,8 +2,6 @@
 // Created by lowrider on 2021-03-30.
 //
 
-#include <malloc.h>
-#include <stdlib.h>
 #include "../header/FileReader.h"
 
 FILE *fr_get_file(const char *fileName) {

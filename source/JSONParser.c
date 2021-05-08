@@ -1,8 +1,3 @@
-//
-// Created by lowrider on 2021-03-28.
-//
-#include <vcruntime_string.h>
-#include <stdio.h>
 #include "../header/JSONParser.h"
 
 unsigned int idx;

@@ -2,8 +2,16 @@
 // Fills in the gap between psx sdk and this mock project
 //
 
-#ifndef HACKSX_MISSINGTYPES_H
-#define HACKSX_MISSINGTYPES_H
+#include "Logger.h"
+
+#ifndef HACKSX_MOCKPSXTYPES_H
+#define HACKSX_MOCKPSXTYPES_H
+
+#define FntPrint(c, args) \
+logr_log(INFO, c, args)
+
+#define DrawPrim(tile) \
+logr_log(INFO, "Drawing Primes")
 
 typedef unsigned char u_char;
 typedef unsigned long u_long;
@@ -28,4 +36,9 @@ typedef struct {
     long rotate;
 } GsSPRITE;
 
-#endif //HACKSX_MISSINGTYPES_H
+typedef struct {
+    unsigned long offset;
+    unsigned long point;
+} GsOT;
+
+#endif //HACKSX_MOCKPSXTYPES_H

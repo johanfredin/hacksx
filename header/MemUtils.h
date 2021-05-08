@@ -1,6 +1,8 @@
 #ifndef PSX_MEM_UTILS_H
 #define PSX_MEM_UTILS_H
 
+#include <stdlib.h>
+
 #define MEM_HEAP_DEFAULT_START_ADDR 0x800F8000
 #define MEM_HEAP_DEFAULT_SIZE 0x00100000
 

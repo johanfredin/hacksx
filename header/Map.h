@@ -1,11 +1,10 @@
 #ifndef PSX_GRIDMAP_H
 #define PSX_GRIDMAP_H
 
-#include "AssetManager.h"
 #include "CdReader.h"
-#include "GameObject.h"
 #include "JSONParser.h"
 #include "Tiled.h"
+#include "GPUBase.h"
 
 /**
  * Allocates heap for passed in collision block, its bounds

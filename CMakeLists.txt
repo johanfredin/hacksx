@@ -8,12 +8,19 @@ include_directories(header)
 add_executable(hacksx
         header/FileReader.h
         header/JSONParser.h
+        header/CdReader.h
+        header/Map.h
         header/Tiled.h
+        header/Logger.h
+        header/MemUtils.h
+        header/StrUtils.h
+        header/MockPSXTypes.h
+        header/GPUBase.h
+        source/CdReader.c
+        source/Map.c
         source/FileReader.c
         source/Main.c
         source/JSONParser.c
         source/Tiled.c
-        header/Logger.h
-        header/MemUtils.h
-        header/StrUtils.h
-        source/Logger.c header/MissingTypes.h)
+        source/GPUBase.c
+        source/Logger.c )
