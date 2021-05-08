@@ -5,13 +5,6 @@
 #include "../header/Tiled.h"
 #include "string.h"
 
-typedef unsigned long u_long;
-
-typedef struct {
-    short x, y;        /* offset point on VRAM */
-    short w, h;        /* width and height */
-} RECT;
-
 #define MAP_PROP_VAL_IF_PRESENT_OR(prop_to_set, prop_to_check, default_value) \
     if (prop_to_check == NULL) {                                              \
         prop_to_set = default_value;                                          \

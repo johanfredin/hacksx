@@ -9,7 +9,7 @@
 #include "StrUtils.h"
 #include "MemUtils.h"
 #include "Logger.h"
-#include "Types.h"
+#include "MissingTypes.h"
 
 typedef struct {
     unsigned char integer: 1;

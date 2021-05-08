@@ -16,4 +16,4 @@ add_executable(hacksx
         header/Logger.h
         header/MemUtils.h
         header/StrUtils.h
-        source/Logger.c header/Types.h)
+        source/Logger.c header/MissingTypes.h)
