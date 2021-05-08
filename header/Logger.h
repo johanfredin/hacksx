@@ -25,6 +25,18 @@
     logr_log(level, "spawn_y=%d", gobj->spawn_y); \
     logr_log(level, "type=%d", gobj->type)
 
+#define LOGR_LOG_TELEPORT(level, teleport)                \
+    logr_log(level, "*********************");     \
+    logr_log(level, "*   Teleport        *");     \
+    logr_log(level, "*********************");     \
+    logr_log(level, "x=%d", (&teleport)->origin.x); \
+    logr_log(level, "y=%d", (&teleport)->origin.y); \
+    logr_log(level, "w=%d", (&teleport)->origin.w);             \
+    logr_log(level, "h=%d", (&teleport)->origin.h);             \
+    logr_log(level, "dest_x=%d", (&teleport)->dest_x);   \
+    logr_log(level, "dest_y=%d", (&teleport)->dest_y); \
+    logr_log(level, "dest_frame=%d", (&teleport)->dest_frame)
+
 /*
  * Log a message at specified level
  * @param level log level (0=err, 1=warn, 2=info, 3=debug, 4=trace)

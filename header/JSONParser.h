@@ -5,7 +5,6 @@
 #ifndef PSX_SPIKE_PARSER_H
 #define PSX_SPIKE_PARSER_H
 
-#include "Utils.h"
 #include <stdlib.h>
 #include "StrUtils.h"
 #include "MemUtils.h"

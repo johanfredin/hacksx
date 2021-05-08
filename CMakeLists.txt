@@ -9,7 +9,6 @@ add_executable(hacksx
         header/FileReader.h
         header/JSONParser.h
         header/Tiled.h
-        header/Utils.h
         source/FileReader.c
         source/Main.c
         source/JSONParser.c

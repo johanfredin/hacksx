@@ -1,6 +1,3 @@
-//
-// Created by lowrider on 2021-03-22.
-//
 
 #include "../header/Tiled.h"
 
@@ -100,7 +97,6 @@ void tiled_print_map(Tile_Map *map) {
         logr_log(INFO, "      y=%d ", teleports_layer->y);
         logr_log(INFO, "      width=%d ", teleports_layer->width);
         logr_log(INFO, "      height=%d ", teleports_layer->height);
-        logr_log(INFO, "      visible=%d ", teleports_layer->visible);
         logr_log(INFO, "      dest_frame=%d ", teleports_layer->dest_frame);
         logr_log(INFO, "      dest_x=%d ", teleports_layer->dest_x);
         logr_log(INFO, "      dest_y=%d ", teleports_layer->dest_y);
@@ -238,8 +234,21 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
                 JSON_Data *props_curr;
                 for (props_curr = props_root; props_curr != NULL; props_curr = props_curr->next) {
                     JSON_Data *teleport_property_obj = (JSON_Data *) props_curr->value;
+
+                    // Make sure property key=name
+                    if(!(STREQ(teleport_property_obj->key, "name"))) {
+                        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", teleport_property_obj->key);
+                        exit(1);
+                    }
+
+                    // Make sure property key 2 links down = "value"
+                    if(!(STREQ(teleport_property_obj->next->next->key, "value"))) {
+                        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", teleport_property_obj->next->next->key);
+                        exit(1);
+                    }
+
                     char *prop_name = (char*) teleport_property_obj->value;
-                    int prop_value = *(int*) teleport_property_obj->next->next->value;
+                    short prop_value = *(short*) teleport_property_obj->next->next->value;
                     if(STREQ(prop_name, "dest_frame")) {
                         ol_curr->dest_frame = prop_value;
                     } else if(STREQ(prop_name, "dest_x")) {

@@ -12,6 +12,13 @@ typedef struct {
     short w, h;        /* width and height */
 } RECT;
 
+#define MAP_PROP_VAL_IF_PRESENT_OR(prop_to_set, prop_to_check, default_value) \
+    if (prop_to_check == NULL) {                                              \
+        prop_to_set = default_value;                                          \
+    } else {                                                                  \
+        prop_to_set = prop_to_check;                                          \
+    }
+
 typedef struct CollisionBlock {
     RECT *bounds;         // The actual physical bounds that we will collide with in the frame
     u_char amount;        // The amount of blocks on one frame
@@ -108,7 +115,6 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
     content = json_cdr_data->file;
     map_data = jsonp_parse(content);
-//    jsonp_print_data(map_data);
     tile_map = tiled_populate_from_json(map_data);
     tiled_print_map(tile_map);
     // Init collision blocks
@@ -129,11 +135,13 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
         teleports[i].origin = get_rect(curr_t->x, curr_t->y, curr_t->width, curr_t->height);
 
         // Replace with real values once json parser updated
-        teleports[i].dest_x = 126;
-        teleports[i].dest_y = 128;
-        teleports[i].dest_frame = current_frame;
+        MAP_PROP_VAL_IF_PRESENT_OR(teleports[i].dest_x, curr_t->dest_x, -1)
+        MAP_PROP_VAL_IF_PRESENT_OR(teleports[i].dest_y, curr_t->dest_y, -1)
+        teleports[i].dest_frame = curr_t->dest_frame;
 
+        LOGR_LOG_TELEPORT(INFO, teleports[i]);
     }
+
     frame->t_amount = teleports_cnt;
     frame->teleports = teleports;
 

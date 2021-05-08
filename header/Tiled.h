@@ -7,12 +7,6 @@
 
 #include "JSONParser.h"
 
-typedef enum Object_Layer_Type {
-    BOUNDS,
-    TELEPORTS
-} Object_Layer_Type;
-
-
 typedef struct ObjectLayer_Bounds {
     u_int width, height;
     u_int id;
@@ -25,7 +19,8 @@ typedef struct ObjectLayer_Teleport {
     u_int width, height;
     u_int id;
     u_char visible;
-    u_int x, y, dest_x, dest_y;
+    u_int x, y;
+    short dest_x, dest_y;
     u_char dest_frame;
     struct ObjectLayer_Teleport *next;
 } ObjectLayer_Teleport;
