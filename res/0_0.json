@@ -164,11 +164,6 @@
                          "value":4
                         }, 
                         {
-                         "name":"dest_x",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
                          "name":"dest_y",
                          "type":"int",
                          "value":166
@@ -191,11 +186,6 @@
                          "value":1
                         }, 
                         {
-                         "name":"dest_x",
-                         "type":"int",
-                         "value":-1
-                        }, 
-                        {
                          "name":"dest_y",
                          "type":"int",
                          "value":2
@@ -205,7 +195,7 @@
                  "visible":true,
                  "width":128,
                  "x":16,
-                 "y":256
+                 "y":255
                 }, 
                 {
                  "height":144,
@@ -221,17 +211,12 @@
                          "name":"dest_x",
                          "type":"int",
                          "value":2
-                        }, 
-                        {
-                         "name":"dest_y",
-                         "type":"int",
-                         "value":-1
                         }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":1,
-                 "x":256,
+                 "x":255,
                  "y":32
                 }],
          "opacity":1,

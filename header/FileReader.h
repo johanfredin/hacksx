@@ -7,6 +7,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "StrUtils.h"
+#include <Logger.h>
 
 FILE *fr_get_file(const char *fileName);
 char *fr_get_content(const char *fileName);

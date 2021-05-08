@@ -9,11 +9,6 @@ u_char assets_count;
 u_char frame_cnt;
 u_char current_frame = START_FRAME;
 
-#define INIT_TELEPORT(teleport) \
-teleport.dest_frame = 0; \
-teleport.dest_x = 0; \
-teleport.dest_y = 0
-
 void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_file);
 void init_smaller_frame(Frame *frame, char *bg, char *fg, char *json_map_file, u_char x, u_char y);
 RECT get_rect(u_short x, u_short y, u_short w, u_short h);
@@ -135,13 +130,13 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     teleports = MEM_CALLOC_3(teleports_cnt, Teleport);
     for (i = 0, curr_t = tile_map->teleports; curr_t != NULL; i++, curr_t = curr_t->next) {
         
-        INIT_TELEPORT(teleports[i]);
-
         teleports[i].origin = get_rect(curr_t->x, curr_t->y, curr_t->width, curr_t->height);
         
         teleports[i].dest_x = (curr_t->dest_x == 0) ? -1 : curr_t->dest_x;
         teleports[i].dest_y = (curr_t->dest_y == 0) ? -1 : curr_t->dest_y;
         teleports[i].dest_frame = curr_t->dest_frame;
+
+        LOGR_LOG_TELEPORT(INFO, teleports[i]);
 
         if(GPUB_DRAW_BOUNDS) {
             teleports[i].t_bound_lines = get_tile(curr_t->x, curr_t->y, curr_t->width, curr_t->height, 0, 0, 255);

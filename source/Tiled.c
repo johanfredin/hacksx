@@ -256,7 +256,6 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
                     } else if(STREQ(prop_name, "dest_y")) {
                         ol_curr->dest_y = prop_value;
                     }
-                    logr_log(INFO, "Yolo");
                 }
             }
         }

@@ -31,25 +31,8 @@ CdrData *cdr_find_data_entry(char* name, CdrData **assets, u_char assets_cnt) {
 
 CdrData *cdr_read_file(char *file_path) {
     CdrData *data = malloc(sizeof(CdrData));
-    char *buffer = NULL;
-    size_t length;
-    FILE *file = fr_get_file(file_path);
-    printf("File=%s retrieved\n", file_path);
-    fseek(file, 0, SEEK_END);
-    length = ftell(file) + 1;   // Reserved for null terminator
-    fseek(file, 0, SEEK_SET);
-    buffer = malloc(length);
-    int i;
-    for (i = 0; i < length; i++) {
-        buffer[i] = 0;
-    }
-    if (buffer) {
-        fread(buffer, 1, length, file);
-        buffer[length - 1] = '\0';
-    }
-
     data->name = file_path;
-    data->file = buffer;
+    data->file = fr_get_content(file_path);
     return data;
 }
 

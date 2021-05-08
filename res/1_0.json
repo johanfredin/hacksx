@@ -126,33 +126,71 @@
                  "height":144,
                  "id":8,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":0
+                        }, 
+                        {
+                         "name":"dest_x",
+                         "type":"int",
+                         "value":238
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":4,
+                 "width":1,
                  "x":0,
                  "y":32
                 }, 
                 {
-                 "height":4,
+                 "height":1,
                  "id":9,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":3
+                        }, 
+                        {
+                         "name":"dest_y",
+                         "type":"int",
+                         "value":2
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":80,
                  "x":160,
-                 "y":252
+                 "y":255
                 }, 
                 {
                  "height":8,
                  "id":10,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":6
+                        }, 
+                        {
+                         "name":"dest_x",
+                         "type":"int",
+                         "value":112
+                        }, 
+                        {
+                         "name":"dest_y",
+                         "type":"int",
+                         "value":188
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":16,
-                 "x":176,
+                 "width":8,
+                 "x":180,
                  "y":84
                 }],
          "opacity":1,
