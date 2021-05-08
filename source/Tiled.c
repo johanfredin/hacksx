@@ -209,8 +209,7 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     JSON_Data *curr_obj_layer; // Our current json object being iterated
     ol_root = MEM_MALLOC_3(ObjectLayer_Teleport);
     ol_curr = ol_root;
-    for (curr_obj_layer = root, objects_cnt = 0;
-        curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
+    for (curr_obj_layer = root, objects_cnt = 0; curr_obj_layer != NULL; curr_obj_layer = curr_obj_layer->next, objects_cnt++) {    // Iterate objects
         JSON_Data *entry_root = (JSON_Data *) curr_obj_layer->value;
         JSON_Data *entry_curr;
         for (entry_curr = entry_root; entry_curr != NULL; entry_curr = entry_curr->next) { // Iterate object properties
@@ -234,6 +233,11 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
                 JSON_Data *props_curr;
                 for (props_curr = props_root; props_curr != NULL; props_curr = props_curr->next) {
                     JSON_Data *teleport_property_obj = (JSON_Data *) props_curr->value;
+
+                    // Init dest properties to 0 to prevent garbage
+                    ol_curr->dest_x = 0;
+                    ol_curr->dest_y = 0;
+                    ol_curr->dest_frame = 0;
 
                     // Make sure property key=name
                     if(!(STREQ(teleport_property_obj->key, "name"))) {
