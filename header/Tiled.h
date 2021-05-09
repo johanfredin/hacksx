@@ -7,6 +7,16 @@
 
 #include "JSONParser.h"
 
+#define TILED_VALIDATE_PROP(key, val) \
+    if(!(STREQ(key, "name"))) { \
+        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", key); \
+        exit(1); \
+    }                                     \
+    if(!(STREQ(val, "value"))) { \
+        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", val); \
+        exit(1); \
+    }
+
 typedef struct ObjectLayer_Bounds {
     u_int width, height;
     u_int id;
@@ -47,6 +57,7 @@ typedef struct Tile_Map {
     ObjectLayer_Teleport *teleports;
     u_char bounds_cnt;
     u_char teleports_cnt;
+    u_short offset_x, offset_y;
 } Tile_Map;
 
 /**

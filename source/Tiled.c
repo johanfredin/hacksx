@@ -3,6 +3,7 @@
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);
+void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root);
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root);
 void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root);
 
@@ -28,6 +29,8 @@ Tile_Map *tiled_populate_from_json(JSON_Data *root) {
         } else if (STREQ(key, "layers")) {
             // Linked list of json bounds found
             add_tile_layers_to_map(tm, (JSON_Data *) value);
+        } else if(STREQ(key, "properties")) {
+            add_additional_properties_to_map(tm, (JSON_Data *) value);
         }
     }
     return tm;
@@ -56,6 +59,8 @@ void tiled_print_map(Tile_Map *map) {
     logr_log(INFO, "-------------------- ");
     logr_log(INFO, "Bounds cnt=%d", map->bounds_cnt);
     logr_log(INFO, "Teleports cnt=%d", map->teleports_cnt);
+    logr_log(INFO, "Offset-X=%d", map->offset_x);
+    logr_log(INFO, "Offset-Y=%d", map->offset_y);
     logr_log(INFO, "{ ");
     logr_log(INFO, "  width=%d ", map->width);
     logr_log(INFO, "  height=%d ", map->height);
@@ -231,28 +236,31 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
             } else if (STREQ(key, "properties")) {
                 JSON_Data *props_root = (JSON_Data *) entry_curr->value;
                 JSON_Data *props_curr;
+
+                // Init dest properties to 0 to prevent garbage
+                ol_curr->dest_x = 0;
+                ol_curr->dest_y = 0;
+                ol_curr->dest_frame = 0;
+
                 for (props_curr = props_root; props_curr != NULL; props_curr = props_curr->next) {
                     JSON_Data *teleport_property_obj = (JSON_Data *) props_curr->value;
-
-                    // Init dest properties to 0 to prevent garbage
-                    ol_curr->dest_x = 0;
-                    ol_curr->dest_y = 0;
-                    ol_curr->dest_frame = 0;
-
-                    // Make sure property key=name
-                    if(!(STREQ(teleport_property_obj->key, "name"))) {
-                        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", teleport_property_obj->key);
-                        exit(1);
-                    }
-
-                    // Make sure property key 2 links down = "value"
-                    if(!(STREQ(teleport_property_obj->next->next->key, "value"))) {
-                        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", teleport_property_obj->next->next->key);
-                        exit(1);
-                    }
-
                     char *prop_name = (char*) teleport_property_obj->value;
                     short prop_value = *(short*) teleport_property_obj->next->next->value;
+
+                    TILED_VALIDATE_PROP(teleport_property_obj->key, teleport_property_obj->next->next->key)
+
+                    // Make sure property key=name
+//                    if(!(STREQ(teleport_property_obj->key, "name"))) {
+//                        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", teleport_property_obj->key);
+//                        exit(1);
+//                    }
+
+                    // Make sure property key 2 links down = "value"
+//                    if(!(STREQ(teleport_property_obj->next->next->key, "value"))) {
+//                        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", teleport_property_obj->next->next->key);
+//                        exit(1);
+//                    }
+
                     if(STREQ(prop_name, "dest_frame")) {
                         ol_curr->dest_frame = prop_value;
                     } else if(STREQ(prop_name, "dest_x")) {
@@ -267,6 +275,32 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     }
     tm->teleports = ol_root;
     tm->teleports_cnt = objects_cnt;
+}
+
+void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root) {
+    JSON_Data *curr;
+
+    // To prevent garbage
+    tm->offset_x = 0;
+    tm->offset_y = 0;
+
+    // Iterate properties array
+    for (curr = root; curr != NULL; curr = curr->next) {
+        JSON_Data *curr_props = (JSON_Data *) curr->value;
+
+        // Fetch the 2 properties needed in json object
+        char *prop_name = (char *) curr_props->value;
+        u_short prop_value = *(u_short*) curr_props->next->next->value;
+
+        // Validate that the property prop_value is actually 2 lanes down
+        TILED_VALIDATE_PROP(curr_props->key, curr_props->next->next->key)
+
+        if (STREQ(prop_name, "offset_x")) {
+            tm->offset_x = prop_value;
+        } else if (STREQ(prop_name, "offset_y")) {
+            tm->offset_y = prop_value;
+        }
+    }
 }
 
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root) {

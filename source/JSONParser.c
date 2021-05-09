@@ -61,7 +61,7 @@ JSON_Data *jsonp_parse(char *file_content) {
 void jsonp_print_data(JSON_Data *root) {
     printf("{\n");
     print_recursive(root, 2);
-    printf("}");
+    printf("}\n");
 }
 
 void jsonp_free(JSON_Data *root) {
