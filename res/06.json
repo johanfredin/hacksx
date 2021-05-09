@@ -1,4 +1,11 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json"
+        }
+    },
  "height":12,
  "infinite":false,
  "layers":[
@@ -119,17 +126,6 @@
                  "width":16,
                  "x":16,
                  "y":100
-                }, 
-                {
-                 "height":0,
-                 "id":22,
-                 "name":"",
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":-68,
-                 "y":148
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -141,7 +137,7 @@
          "color":"#0055ff",
          "draworder":"topdown",
          "id":8,
-         "name":"teleport",
+         "name":"teleports",
          "objects":[
                 {
                  "height":8,
@@ -158,6 +154,17 @@
                  "height":16,
                  "id":17,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":5
+                        }, 
+                        {
+                         "name":"dest_y",
+                         "type":"int",
+                         "value":238
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -174,6 +181,17 @@
  "nextlayerid":12,
  "nextobjectid":23,
  "orientation":"orthogonal",
+ "properties":[
+        {
+         "name":"offset_x",
+         "type":"int",
+         "value":64
+        }, 
+        {
+         "name":"offset_y",
+         "type":"int",
+         "value":32
+        }],
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
  "tileheight":16,
