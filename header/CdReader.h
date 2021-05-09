@@ -8,7 +8,7 @@
 
 typedef struct {
     char *name;
-    char *file;
+    u_long *file;
 } CdrData;
 
 void cdr_open();

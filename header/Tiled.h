@@ -7,6 +7,12 @@
 
 #include "JSONParser.h"
 
+/**
+ * Make sure that passed in key=&quot;name&quot;<br>
+ * Make sure that passed in val=&quot;value&quot;
+ * @param key key to check
+ * @param val value to check
+ */
 #define TILED_VALIDATE_PROP(key, val) \
     if(!(STREQ(key, "name"))) { \
         logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", key); \

@@ -15,3 +15,7 @@ GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blen
     return dummy;
 }
 
+GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits, u_short offset_x, u_short offset_y) {
+    return asmg_load_sprite(cdr_data, x + offset_x, y + offset_y, blend, num_color_bits);
+}
+

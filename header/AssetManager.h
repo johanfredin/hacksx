@@ -23,5 +23,6 @@ typedef struct {
 
 void asmg_load_asset(VramAsset *vram_asset, CdrData *cdr_data, u_short num_color_bits);
 GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits);
+GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits, u_short offset_x, u_short offset_y);
 
 #endif // PSX_ASSET_MANAGER_H

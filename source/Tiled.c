@@ -1,4 +1,3 @@
-
 #include "../header/Tiled.h"
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
@@ -6,6 +5,8 @@ void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);
 void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root);
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root);
 void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root);
+Tile_Map *malloc_tile_map();
+
 
 Tile_Map *tiled_populate_from_json(JSON_Data *root) {
     JSON_Data *curr;
@@ -14,7 +15,7 @@ Tile_Map *tiled_populate_from_json(JSON_Data *root) {
         logr_log(ERROR, "ERROR: root is NULL");
         exit(1);
     }
-    tm = MEM_MALLOC_3(Tile_Map);
+    tm = malloc_tile_map();
     for (curr = root; curr != NULL; curr = curr->next) {
         char *key = curr->key;
         void *value = curr->value;
@@ -33,6 +34,18 @@ Tile_Map *tiled_populate_from_json(JSON_Data *root) {
             add_additional_properties_to_map(tm, (JSON_Data *) value);
         }
     }
+    return tm;
+}
+
+Tile_Map *malloc_tile_map() {
+    Tile_Map *tm = MEM_MALLOC_3(Tile_Map);
+    tm->width = tm->height = tm->tile_width = tm->tile_height = 0;
+    tm->layers = NULL;
+    tm->bounds = NULL;
+    tm->teleports = NULL;
+    tm->bounds_cnt = 0;
+    tm->teleports_cnt = 0;
+    tm->offset_x = tm->offset_y = 0;
     return tm;
 }
 
@@ -57,57 +70,57 @@ void tiled_print_map(Tile_Map *map) {
     ObjectLayer_Teleport *teleports_layer;
     logr_log(INFO, "Map parsed from JSON");
     logr_log(INFO, "-------------------- ");
-    logr_log(INFO, "Bounds cnt=%d", map->bounds_cnt);
-    logr_log(INFO, "Teleports cnt=%d", map->teleports_cnt);
-    logr_log(INFO, "Offset-X=%d", map->offset_x);
-    logr_log(INFO, "Offset-Y=%d", map->offset_y);
     logr_log(INFO, "{ ");
+    logr_log(INFO, "  Bounds cnt=%d", map->bounds_cnt);
+    logr_log(INFO, "  Teleports cnt=%d", map->teleports_cnt);
+    logr_log(INFO, "  Offset-X=%d", map->offset_x);
+    logr_log(INFO, "  Offset-Y=%d", map->offset_y);
     logr_log(INFO, "  width=%d ", map->width);
     logr_log(INFO, "  height=%d ", map->height);
     logr_log(INFO, "  tile_width=%d ", map->tile_width);
     logr_log(INFO, "  tile_height=%d ", map->tile_height);
-    logr_log(INFO, "  layers=[ ");
+    logr_log(DEBUG, "  layers=[ ");
     for (tile_layer = map->layers; tile_layer != NULL; tile_layer = tile_layer->next) {
-        logr_log(INFO, "    { ");
-        logr_log(INFO, "      name=%s ", tile_layer->name);
-        logr_log(INFO, "      type=%s ", tile_layer->type);
-        logr_log(INFO, "      id=%d ", tile_layer->id);
-        logr_log(INFO, "      x=%d ", tile_layer->x);
-        logr_log(INFO, "      y=%d ", tile_layer->y);
-        logr_log(INFO, "      width=%d ", tile_layer->width);
-        logr_log(INFO, "      height=%d ", tile_layer->height);
-        logr_log(INFO, "      visible=%d ", tile_layer->visible);
-        logr_log(INFO, "    } ");
+        logr_log(DEBUG, "    { ");
+        logr_log(DEBUG, "      name=%s ", tile_layer->name);
+        logr_log(DEBUG, "      type=%s ", tile_layer->type);
+        logr_log(DEBUG, "      id=%d ", tile_layer->id);
+        logr_log(DEBUG, "      x=%d ", tile_layer->x);
+        logr_log(DEBUG, "      y=%d ", tile_layer->y);
+        logr_log(DEBUG, "      width=%d ", tile_layer->width);
+        logr_log(DEBUG, "      height=%d ", tile_layer->height);
+        logr_log(DEBUG, "      visible=%d ", tile_layer->visible);
+        logr_log(DEBUG, "    } ");
     }
-    logr_log(INFO, "  ] ");
-    logr_log(INFO, "  bounds=[ ");
+    logr_log(DEBUG, "  ] ");
+    logr_log(DEBUG, "  bounds=[ ");
     for (bounds_layer = map->bounds; bounds_layer != NULL; bounds_layer = bounds_layer->next) {
-        logr_log(INFO, "    { ");
-        logr_log(INFO, "      id=%d ", bounds_layer->id);
-        logr_log(INFO, "      visible=%d ", bounds_layer->visible);
-        logr_log(INFO, "      x=%d ", bounds_layer->x);
-        logr_log(INFO, "      y=%d ", bounds_layer->y);
-        logr_log(INFO, "      width=%d ", bounds_layer->width);
-        logr_log(INFO, "      height=%d ", bounds_layer->height);
-        logr_log(INFO, "      visible=%d ", bounds_layer->visible);
-        logr_log(INFO, "    } ");
+        logr_log(DEBUG, "    { ");
+        logr_log(DEBUG, "      id=%d ", bounds_layer->id);
+        logr_log(DEBUG, "      visible=%d ", bounds_layer->visible);
+        logr_log(DEBUG, "      x=%d ", bounds_layer->x);
+        logr_log(DEBUG, "      y=%d ", bounds_layer->y);
+        logr_log(DEBUG, "      width=%d ", bounds_layer->width);
+        logr_log(DEBUG, "      height=%d ", bounds_layer->height);
+        logr_log(DEBUG, "      visible=%d ", bounds_layer->visible);
+        logr_log(DEBUG, "    } ");
     }
-    logr_log(INFO, "  ] ");
-    logr_log(INFO, "  teleports=[ ");
+    logr_log(DEBUG, "  ] ");
+    logr_log(DEBUG, "  teleports=[ ");
     for (teleports_layer = map->teleports; teleports_layer != NULL; teleports_layer = teleports_layer->next) {
-        logr_log(INFO, "    { ");
-        logr_log(INFO, "      id=%d ", teleports_layer->id);
-        logr_log(INFO, "      visible=%d ", teleports_layer->visible);
-        logr_log(INFO, "      x=%d ", teleports_layer->x);
-        logr_log(INFO, "      y=%d ", teleports_layer->y);
-        logr_log(INFO, "      width=%d ", teleports_layer->width);
-        logr_log(INFO, "      height=%d ", teleports_layer->height);
-        logr_log(INFO, "      dest_frame=%d ", teleports_layer->dest_frame);
-        logr_log(INFO, "      dest_x=%d ", teleports_layer->dest_x);
-        logr_log(INFO, "      dest_y=%d ", teleports_layer->dest_y);
-        logr_log(INFO, "    } ");
+        logr_log(DEBUG, "    { ");
+        logr_log(DEBUG, "      id=%d ", teleports_layer->id);
+        logr_log(DEBUG, "      visible=%d ", teleports_layer->visible);
+        logr_log(DEBUG, "      x=%d ", teleports_layer->x);
+        logr_log(DEBUG, "      y=%d ", teleports_layer->y);
+        logr_log(DEBUG, "      width=%d ", teleports_layer->width);
+        logr_log(DEBUG, "      height=%d ", teleports_layer->height);
+        logr_log(DEBUG, "      dest_frame=%d ", teleports_layer->dest_frame);
+        logr_log(DEBUG, "      dest_x=%d ", teleports_layer->dest_x);
+        logr_log(DEBUG, "      dest_y=%d ", teleports_layer->dest_y);
+        logr_log(DEBUG, "    } ");
     }
-    logr_log(INFO, "  ] ");
+    logr_log(DEBUG, "  ] ");
     logr_log(INFO, "} ");
 }
 
@@ -249,18 +262,6 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
 
                     TILED_VALIDATE_PROP(teleport_property_obj->key, teleport_property_obj->next->next->key)
 
-                    // Make sure property key=name
-//                    if(!(STREQ(teleport_property_obj->key, "name"))) {
-//                        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", teleport_property_obj->key);
-//                        exit(1);
-//                    }
-
-                    // Make sure property key 2 links down = "value"
-//                    if(!(STREQ(teleport_property_obj->next->next->key, "value"))) {
-//                        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", teleport_property_obj->next->next->key);
-//                        exit(1);
-//                    }
-
                     if(STREQ(prop_name, "dest_frame")) {
                         ol_curr->dest_frame = prop_value;
                     } else if(STREQ(prop_name, "dest_x")) {
@@ -279,11 +280,6 @@ void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
 
 void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root) {
     JSON_Data *curr;
-
-    // To prevent garbage
-    tm->offset_x = 0;
-    tm->offset_y = 0;
-
     // Iterate properties array
     for (curr = root; curr != NULL; curr = curr->next) {
         JSON_Data *curr_props = (JSON_Data *) curr->value;
