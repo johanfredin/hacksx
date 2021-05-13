@@ -23,7 +23,7 @@ void map_init(u_char level) {
     assets_count = set_level_assets(level);
 
     frames = MEM_CALLOC_3(10, Frame);
-    init_frame(&frames[frame_cnt++], "TILES_4.TIM", NULL, NULL, "SANDBOX.JSON");
+    init_frame(&frames[frame_cnt++], "TILES_8.TIM", NULL, NULL, "SANDBOX.JSON");
     // init_frame(&frames[frame_cnt++], "01BG.TIM", "01FG.TIM", "RAICHU.TIM", "0_1.JSON");
     // init_frame(&frames[frame_cnt++], "10BG.TIM", "10FG.TIM", "RAICHU_2.TIM", "1_0.JSON");
     // init_frame(&frames[frame_cnt++], "11BG.TIM", "11FG.TIM", "ALOLA.TIM", "1_1.JSON");
@@ -98,7 +98,7 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     // INIT SPRITES -----------------------------------------------------------
     bg_cdr_data = cdr_find_data_entry(bg, cdr_data_assets, assets_count);
     frame->bg = asmg_load_sprite_w_offset(bg_cdr_data, 0, 0, 128, COLOR_BITS_4, tile_map->offset_x, tile_map->offset_y); // BG can not be NULL so no check
-    frame->layers = load_layers(bg_cdr_data, tile_map);
+    frame->sprite_layers = load_layers(bg_cdr_data, tile_map);
     if (fg != NULL) {
         CdrData *fg_cdr_data = cdr_find_data_entry(fg, cdr_data_assets, assets_count);
         frame->fg = asmg_load_sprite_w_offset(fg_cdr_data, 0, 0, 128, COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
@@ -150,32 +150,41 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
 }
 
 SpriteLayer *load_layers(CdrData *img_data, Tile_Map *tile_map) {
+    u_short x, y, u, v, i;
+    u_short map_w, map_h, cols, rows;
+    SpriteLayer *sprite_layers;
+
+    Layer_Data *curr = tile_map->layers->data;  // Will be several sprite_layers in real life later!
+
     // Calculate tiles amount on x and y axis
-    u_short cols = tile_map->width / tile_map->tile_width;
-    u_short rows = tile_map->height / tile_map->tile_height;
-    Layer_Data *curr = tile_map->layers->data;  // Will be several layers in real life later!
-    // We will need to fetch multiple layers later and figure out what goes where,
+    map_w = tile_map->width * tile_map->tile_width;
+    map_h = tile_map->height * tile_map->tile_height;
+    cols = map_w / tile_map->tile_width;
+    rows = map_h / tile_map->tile_height;
+
+    sprite_layers = MEM_MALLOC_3(SpriteLayer);
+    sprite_layers->sprite_regions = MEM_CALLOC_3(cols * rows, GsSPRITE);
+
+    // We will need to fetch multiple sprite_layers later and figure out what goes where,
     // but for now just fetch the bg sprite
     GsSPRITE *sprite = asmg_load_sprite(img_data, 0, 0, 128, COLOR_BITS_8);
-
-    tiled_print_map(tile_map);
-
-    u_short x, y, u, v;
-    printf("Load layers\n");
-
+    i = 0;
+    v = 0;
     // Iterate frame tile by tile and fetch appropriate texture region from tile set
-    for (y = v = 0; y < rows; y++, v += tile_map->tile_height) {
+    for (y = 0; y < rows; y++, v += tile_map->tile_height) {
         for (x = u = 0; x < cols; x++, u += tile_map->tile_width) {
             if(curr == NULL) {
-                logr_log(ERROR, "Map.c", "load_layers", "Current layer data entry is null before end of loop, must be a missmatch, terminating...");
+                logr_log(ERROR, "Map.c", "load_layers", "Current layer data entry is null before end of loop, must be a mismatch, terminating...");
                 exit(1);
             }
 
-            printf("%d", curr->id);
+            asmg_get_region(sprite, &sprite_layers->sprite_regions[i], u, v, tile_map->tile_width, tile_map->tile_height);
+            LOGR_LOG_SPRITE(DEBUG, sprite_layers->sprite_regions[i]);
             curr = curr->next;
+            i++;
         }
-        printf("\n");
     }
+    return sprite_layers;
 }
 
 RECT get_rect(short x, short y, short w, short h) {

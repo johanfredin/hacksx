@@ -189,7 +189,7 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
 
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     u_char objects_cnt;
-    ObjectLayer_Bounds *ol_root, *ol_curr; // Our object layers linked list
+    ObjectLayer_Bounds *ol_root, *ol_curr; // Our object sprite_layers linked list
     JSON_Data *curr_obj_layer; // Our current json object being iterated
     ol_root = MEM_MALLOC_3(ObjectLayer_Bounds);
     ol_curr = ol_root;
@@ -223,7 +223,7 @@ void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root) {
 
 void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root) {
     u_char objects_cnt;
-    ObjectLayer_Teleport *ol_root, *ol_curr; // Our object layers linked list
+    ObjectLayer_Teleport *ol_root, *ol_curr; // Our object sprite_layers linked list
     JSON_Data *curr_obj_layer; // Our current json object being iterated
     ol_root = MEM_MALLOC_3(ObjectLayer_Teleport);
     ol_curr = ol_root;

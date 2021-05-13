@@ -13,8 +13,17 @@
 
 #define LOG_LEVEL DEBUG
 
+/*
+ * Log a message at specified level
+ * @param level log level (0=err, 1=warn, 2=info, 3=debug, 4=trace)
+ * @param src_file the name of the C source/header file that called the log function (will be included in log message)
+ * @param src_func the name of the function that called the log function (will be included in log message)
+ * @param msg the message to print
+ */
+void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ...);
+
 #define LOGR_LOG_GOBJ(level, gobj)                                                    \
-    logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*********************", level);     \
+    logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*********************");     \
     logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*   Game Object     *", level);     \
     logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*********************", level);     \
     logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "w=%d", gobj->w, level);             \
@@ -39,13 +48,8 @@
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_y=%d", (&teleport)->dest_y, level); \
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_frame=%d", (&teleport)->dest_frame, level)
 
-/*
- * Log a message at specified level
- * @param level log level (0=err, 1=warn, 2=info, 3=debug, 4=trace)
- * @param src_file the name of the C source/header file that called the log function (will be included in log message)
- * @param src_func the name of the function that called the log function (will be included in log message)
- * @param msg the message to print
- */
-void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ...);
+#define LOGR_LOG_SPRITE(level, sprite) \
+logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", sprite.x, sprite.y, sprite.w, sprite.h, sprite.u, sprite.v)
+
 
 #endif // PSX_LOGGER_H

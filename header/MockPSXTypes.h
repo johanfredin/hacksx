@@ -19,19 +19,22 @@ logr_log(INFO, "MockPSXTypes.h", "SetTile", "Setting Tile")
 #define setRGB0(object, r, g, b) \
 logr_log(INFO, "MockPSXTypes.h", "setRGB0", "Setting rgb")
 
-#define PADLdown 0
-#define PADLup 1
-#define PADLright 2
-#define PADLleft 3
-#define PADselect 4
+#define ONE         4096    /* GTE regards 4096 as 1.0 */
 
+#define PADLdown    0
+#define PADLup      1
+#define PADLright   2
+#define PADLleft    3
+#define PADselect   4
 typedef unsigned char u_char;
+
 typedef unsigned long u_long;
 typedef unsigned short u_short;
 typedef unsigned int u_int;
 
 void FntPrint(char *c, ...);
 
+u_short GetTPage(int tp, int abr, int x, int y);
 u_long PadRead(u_long btn);
 
 typedef struct {
@@ -45,10 +48,16 @@ typedef struct {
     short w, h;
 } TILE;
 
-typedef struct {
+typedef struct GsSPRITE {
     unsigned long attribute;
-    short x, y, u, v;
+    short x, y;
     unsigned short w, h;
+    unsigned short tpage;
+    unsigned char u, v;
+    short cx, cy;
+    unsigned char r, g, b;
+    short mx, my;
+    short scalex, scaley;
     long rotate;
 } GsSPRITE;
 
