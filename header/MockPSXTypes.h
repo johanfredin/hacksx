@@ -8,16 +8,16 @@
 #define HACKSX_MOCKPSXTYPES_H
 
 #define DrawPrim(tile) \
-logr_log(INFO, "Drawing Primes")
+logr_log(INFO, "MockPSXTypes.h", "DrawPrim", "Drawing Primes")
 
 #define GsSortFastSprite(sprite, ot, prio) \
-logr_log(INFO, "Drawing Sprite")
+logr_log(INFO, "MockPSXTypes.h", "GsSortGastSprite", "Drawing Sprite")
 
 #define SetTile(tile) \
-logr_log(INFO, "Setting Tile")
+logr_log(INFO, "MockPSXTypes.h", "SetTile", "Setting Tile")
 
 #define setRGB0(object, r, g, b) \
-logr_log(INFO, "Setting rgb")
+logr_log(INFO, "MockPSXTypes.h", "setRGB0", "Setting rgb")
 
 #define PADLdown 0
 #define PADLup 1
@@ -31,6 +31,7 @@ typedef unsigned short u_short;
 typedef unsigned int u_int;
 
 void FntPrint(char *c, ...);
+
 u_long PadRead(u_long btn);
 
 typedef struct {

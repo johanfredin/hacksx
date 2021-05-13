@@ -25,7 +25,7 @@ CdrData *cdr_find_data_entry(char* name, CdrData **assets, u_char assets_cnt) {
             return assets[i];
         }
     }
-    logr_log(ERROR, "ERROR - No CdrData with name='%s' in passed in array, terminating...", name);
+    logr_log(ERROR, "CdReader.c", "cdr_find_data_entry", "No CdrData with name='%s' in passed in array, terminating...", name);
     exit(1);
 }
 

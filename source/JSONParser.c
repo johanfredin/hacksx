@@ -156,7 +156,7 @@ void get_str(JSON_Data *entry, u_char type) {
         entry->value = str;
         entry->type.str = 1;
     } else {
-        logr_log(ERROR, "ERROR - value=%c not one of 'k', 'v'\n", type);
+        logr_log(ERROR, "JSONParser.c", "get_str", "value=%c not one of 'k', 'v'\n", type);
         exit(1);
     }
 }
@@ -166,7 +166,7 @@ void get_number(JSON_Data *entry) {
     float *f_ptr;
     int *i_ptr;
     if (strchr(num_str, '.')) {
-        logr_log(TRACE, "WARN - Floating point not implemented for ps1 and will not be parsed, key=%s", entry->key);
+        logr_log(TRACE, "JSONParcer.c", "get_number", "Floating point not implemented for ps1 and will not be parsed, key=%s", entry->key);
         // f_ptr = malloc(sizeof(float));
         // *f_ptr = strtof(num_str, NULL);
         // entry->value = f_ptr;

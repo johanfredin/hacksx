@@ -15,11 +15,11 @@
  */
 #define TILED_VALIDATE_PROP(key, val) \
     if(!(STREQ(key, "name"))) { \
-        logr_log(ERROR, "ERROR - property key='name' expected here, instead was=%s, exiting...", key); \
+        logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='name' expected here, instead was=%s, exiting...", key); \
         exit(1); \
     }                                     \
     if(!(STREQ(val, "value"))) { \
-        logr_log(ERROR, "ERROR - property key='value' expected here, instead was='%s', exiting...", val); \
+        logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='value' expected here, instead was='%s', exiting...", val); \
         exit(1); \
     }
 
