@@ -49,7 +49,7 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_frame=%d", (&teleport)->dest_frame, level)
 
 #define LOGR_LOG_SPRITE(level, sprite) \
-logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", sprite.x, sprite.y, sprite.w, sprite.h, sprite.u, sprite.v)
+logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", sprite->x, sprite->y, sprite->w, sprite->h, sprite->u, sprite->v)
 
 
 #endif // PSX_LOGGER_H

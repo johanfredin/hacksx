@@ -151,39 +151,50 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
 
 SpriteLayer *load_layers(CdrData *img_data, Tile_Map *tile_map) {
     u_short x, y, u, v, i;
-    u_short map_w, map_h, cols, rows;
+    u_short map_w, map_h, map_tw, map_th, cols, rows;
+    GsSPRITE *sprite;
     SpriteLayer *sprite_layers;
 
-    Layer_Data *curr = tile_map->layers->data;  // Will be several sprite_layers in real life later!
+    Layer_Data *curr = tile_map->layers->data; // Will be several sprite_layers in real life later!
 
     // Calculate tiles amount on x and y axis
-    map_w = tile_map->width * tile_map->tile_width;
-    map_h = tile_map->height * tile_map->tile_height;
-    cols = map_w / tile_map->tile_width;
-    rows = map_h / tile_map->tile_height;
+    map_tw = tile_map->tile_width;
+    map_th = tile_map->tile_height;
+    map_w = tile_map->width * map_tw;
+    map_h = tile_map->height * map_th;
+    cols = map_w / map_tw;
+    rows = map_h / map_th;
 
     sprite_layers = MEM_MALLOC_3(SpriteLayer);
-    sprite_layers->sprite_regions = MEM_CALLOC_3(cols * rows, GsSPRITE);
+    sprite_layers->sprite_regions = MEM_CALLOC_3_PTRS(cols * rows, GsSPRITE);
 
     // We will need to fetch multiple sprite_layers later and figure out what goes where,
     // but for now just fetch the bg sprite
-    GsSPRITE *sprite = asmg_load_sprite(img_data, 0, 0, 128, COLOR_BITS_8);
+    sprite = asmg_load_sprite(img_data, 0, 0, 128, COLOR_BITS_8);
     i = 0;
     v = 0;
     // Iterate frame tile by tile and fetch appropriate texture region from tile set
     for (y = 0; y < rows; y++, v += tile_map->tile_height) {
-        for (x = u = 0; x < cols; x++, u += tile_map->tile_width) {
-            if(curr == NULL) {
+        for (x = 0, u = 0; x < cols; x++) {
+            if (curr == NULL) {
                 logr_log(ERROR, "Map.c", "load_layers", "Current layer data entry is null before end of loop, must be a mismatch, terminating...");
                 exit(1);
             }
 
-            asmg_get_region(sprite, &sprite_layers->sprite_regions[i], u, v, tile_map->tile_width, tile_map->tile_height);
-            LOGR_LOG_SPRITE(DEBUG, sprite_layers->sprite_regions[i]);
+            if (curr->id == 0) {
+                logr_log(DEBUG, "Map.c", "load_layers", "id=0 data entry found at i=%d, skipping since 0=no tile", i);
+            } else {
+                GsSPRITE *region = MEM_MALLOC_3(GsSPRITE);
+                // asmg_get_region(sprite, &sprite_layers->sprite_regions[i], u * curr->id, v, tile_map->tile_width, tile_map->tile_height);
+                asmg_get_region(sprite, region, x * cols, y * rows, 0, 0, map_tw, map_th);
+                LOGR_LOG_SPRITE(DEBUG, region);
+                sprite_layers->sprite_regions[i] = region;
+                i++;
+            }
             curr = curr->next;
-            i++;
         }
     }
+    logr_log(INFO, "Map.c", "load_layers", "%d sprites added", i);
     return sprite_layers;
 }
 

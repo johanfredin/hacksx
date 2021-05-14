@@ -42,7 +42,7 @@ GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_s
     return asmg_load_sprite(cdr_data, x + offset_x, y + offset_y, blend, num_color_bits);
 }
 
-void asmg_get_region(GsSPRITE *sprite, GsSPRITE *region, u_short u, u_short v, u_short w, u_short h) {
+void asmg_get_region(GsSPRITE *sprite, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h) {
     region->x = sprite->x;
     region->y = sprite->y;
     region->u = u;
