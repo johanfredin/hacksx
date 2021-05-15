@@ -81,6 +81,7 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     // Declarations --------------------------
     CdrData *bg_cdr_data, *json_cdr_data;
     u_long *content;
+    GsBG *gs_bg;
     JSON_Data *map_data;
     Tile_Map *tile_map;
     ObjectLayer_Bounds *curr_b;
@@ -97,16 +98,20 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
 
     // INIT SPRITES -----------------------------------------------------------
     bg_cdr_data = cdr_find_data_entry(bg, cdr_data_assets, assets_count);
-    frame->bg = asmg_load_sprite_w_offset(bg_cdr_data, 0, 0, 128, COLOR_BITS_4, tile_map->offset_x, tile_map->offset_y); // BG can not be NULL so no check
-    frame->sprite_layers = load_layers(bg_cdr_data, tile_map);
-    if (fg != NULL) {
-        CdrData *fg_cdr_data = cdr_find_data_entry(fg, cdr_data_assets, assets_count);
-        frame->fg = asmg_load_sprite_w_offset(fg_cdr_data, 0, 0, 128, COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
-    }
-    if (gobj != NULL) {
-        CdrData *gobj_cdr_data = cdr_find_data_entry(gobj, cdr_data_assets, assets_count);
-        frame->game_object = gobj_init(asmg_load_sprite(gobj_cdr_data, 90, 120, 128, COLOR_BITS_8), 16, 16, 1, 1, 100, GOBJ_TYPE_NPC);
-    }
+
+    // Test GS_BG
+    gs_bg = asmg_get_gs_bg(tile_map, bg_cdr_data);
+
+//    frame->bg = asmg_load_sprite_w_offset(bg_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_4, tile_map->offset_x, tile_map->offset_y); // BG can not be NULL so no check
+//    frame->sprite_layers = load_layers(bg_cdr_data, tile_map);
+//    if (fg != NULL) {
+//        CdrData *fg_cdr_data = cdr_find_data_entry(fg, cdr_data_assets, assets_count);
+//        frame->fg = asmg_load_sprite_w_offset(fg_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
+//    }
+//    if (gobj != NULL) {
+//        CdrData *gobj_cdr_data = cdr_find_data_entry(gobj, cdr_data_assets, assets_count);
+//        frame->game_object = gobj_init(asmg_load_sprite(gobj_cdr_data, 90, 120, 128, ASMG_COLOR_BITS_8), 16, 16, 1, 1, 100, GOBJ_TYPE_NPC);
+//    }
 
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
@@ -170,7 +175,7 @@ SpriteLayer *load_layers(CdrData *img_data, Tile_Map *tile_map) {
 
     // We will need to fetch multiple sprite_layers later and figure out what goes where,
     // but for now just fetch the bg sprite
-    sprite = asmg_load_sprite(img_data, 0, 0, 128, COLOR_BITS_8);
+    sprite = asmg_load_sprite(img_data, 0, 0, 128, ASMG_COLOR_BITS_8);
     i = 0;
     v = 0;
     // Iterate frame tile by tile and fetch appropriate texture region from tile set

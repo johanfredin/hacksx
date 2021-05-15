@@ -11,3 +11,7 @@ u_long PadRead(u_long btn) {
 u_short GetTPage(int tp, int abr, int x, int y) {
     return 1;
 }
+
+u_short GetClut(int x, int y) {
+    return 1;
+}

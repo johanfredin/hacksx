@@ -16,6 +16,8 @@
 #define GPUB_FRAME_BUFFER_WIDTH 1024
 #define GPUB_FRAME_BUFFER_HEIGHT 512
 
+#define GPUB_SET_BRIGHTNESS(rgb_holder, brightness) rgb_holder->r = rgb_holder->g = rgb_holder->b =  brightness
+
 #define GPUB_SCREEN_WIDTH 256    // Width of screen
 #define GPUB_SCREEN_HEIGHT 256   // Height of screen
 

@@ -6,7 +6,7 @@
 #include "MemUtils.h"
 #include "StrUtils.h"
 
-typedef struct {
+typedef struct CdrData {
     char *name;
     u_long *file;
 } CdrData;

@@ -35,6 +35,8 @@ typedef unsigned int u_int;
 void FntPrint(char *c, ...);
 
 u_short GetTPage(int tp, int abr, int x, int y);
+u_short GetClut(int x, int y);
+
 u_long PadRead(u_long btn);
 
 typedef struct {
@@ -65,5 +67,31 @@ typedef struct {
     unsigned long offset;
     unsigned long point;
 } GsOT;
+
+typedef struct GsCELL {
+    unsigned char u, v;
+    unsigned short cba;
+    unsigned short flag;
+    unsigned short tpage;
+} GsCELL;
+
+typedef struct GsMAP {
+    unsigned char cellw, cellh;
+    unsigned short ncellw, ncellh;
+    GsCELL *base;
+    unsigned short *index;
+} GsMAP;
+
+typedef struct GsBG {
+    unsigned long attribute;
+    short x, y;
+    short w, h;
+    short scrollx, scrolly;
+    unsigned char r, g, b;
+    GsMAP *map;
+    short mx, my;
+    short scalex, scaley;
+    long rotate;
+} GsBG;
 
 #endif //HACKSX_MOCKPSXTYPES_H
