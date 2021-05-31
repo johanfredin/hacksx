@@ -32,7 +32,7 @@ CdrData *cdr_find_data_entry(char* name, CdrData **assets, u_char assets_cnt) {
 CdrData *cdr_read_file(char *file_path) {
     CdrData *data = malloc(sizeof(CdrData));
     data->name = file_path;
-    data->file = (long *) fr_get_content(file_path);
+    data->file = (u_long *) fr_get_content(file_path);
     return data;
 }
 

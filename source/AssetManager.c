@@ -24,6 +24,7 @@ GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blen
         sprite->cx = 1;
         sprite->cy = 1;
     }
+
     sprite->r = sprite->g = sprite->b = blend;
     sprite->rotate = GPUB_ROT_ONE * 0; // Rotation, ASMG_ROT_ONE * (0 to 360)
     sprite->mx = 0;               // Rotation x coord
@@ -35,7 +36,7 @@ GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blen
     logr_log(DEBUG, "AssetManager.c", "asmg_load_sprite", "cx=%d, cy=%d", sprite->cx, sprite->cy);
     logr_log(DEBUG, "AssetManager.c", "asmg_load_sprite", "u=%d, v=%d", sprite->u, sprite->v);
 
-    MEM_FREE_3_AND_NULL(asset);
+    ASMG_FREE_VRAM_ASSET(asset);
     return sprite;
 }
 
@@ -44,26 +45,23 @@ GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_s
     return asmg_load_sprite(cdr_data, x + offset_x, y + offset_y, blend, num_color_bits);
 }
 
-void asmg_get_region(GsSPRITE *sprite, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h) {
-    region->x = sprite->x;
-    region->y = sprite->y;
-    region->u = u;
-    region->v = v;
-    region->attribute = sprite->attribute;
-    region->rotate = sprite->rotate;
-    region->tpage = sprite->tpage;
-    region->scalex = sprite->scalex;
-    region->scaley = sprite->scaley;
-    region->rotate = sprite->rotate;
+void asmg_get_region(GsSPRITE *base, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h) {
+    region->attribute = base->attribute;
+    region->x = x;
+    region->y = y;
     region->w = w;
     region->h = h;
-    region->r = sprite->r;
-    region->g = sprite->g;
-    region->b = sprite->b;
-    region->cx = sprite->cx;
-    region->cy = sprite->cy;
-    region->mx = sprite->mx;
-    region->my = sprite->my;
+    region->tpage = base->tpage;
+    region->u = u;
+    region->v = v;
+    region->cx = base->cx;
+    region->cy = base->cy;
+    GPUB_SET_BRIGHTNESS(region, 128);
+    region->rotate = GPUB_ROT_ONE * 0; // Rotation, ROT_ONE * (0 to 360)
+    region->mx = 0;                    // Rotation x coord
+    region->my = 0;                    // Rotation y coord
+    region->scalex = ONE * 1;
+    region->scaley = ONE * 1;
 }
 
 GsBG *asmg_get_gs_bg(Tile_Map *tm, CdrData *sprite_data) {
