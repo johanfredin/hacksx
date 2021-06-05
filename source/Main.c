@@ -12,11 +12,11 @@ int main() {
     GPUB_SET_BRIGHTNESS((&sprite), 128);
     sprite.w = sprite.h = 256;
 
-    GsSPRITE *tiles = tiles_get_gs_tile_sprites_mapped(&sprite, &map);
-    for (i = 0; i < 256-8; i++) {
-        GsSPRITE curr = tiles[i];
-        printf("[%d, %d], ", curr.x, curr.y);
-    }
-    printf("\n");
+    GsSPRITE **tiles = tiles_get_gs_tile_sprites_mapped(&sprite, &map);
+//    for(i = 0; i < 300; i++) {
+//        if (tiles[i] != NULL) {
+//            GPUB_GS_SORT_FAST_OBJ(tiles[i]);
+//        }
+//    }
     return 0;
 }

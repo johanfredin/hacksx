@@ -37,6 +37,8 @@ void FntPrint(char *c, ...);
 u_short GetTPage(int tp, int abr, int x, int y);
 u_short GetClut(int x, int y);
 
+
+
 u_long PadRead(u_long btn);
 
 typedef struct {

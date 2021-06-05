@@ -8,6 +8,6 @@
 #include <MockPSXTypes.h>
 #include <Tiled.h>
 
-GsSPRITE *tiles_get_gs_tile_sprites_mapped(GsSPRITE *tile_set, Tile_Map *map);
+GsSPRITE **tiles_get_gs_tile_sprites_mapped(GsSPRITE *tile_set, Tile_Map *map);
 
 #endif //HACKSX_TILEFETCHER_H

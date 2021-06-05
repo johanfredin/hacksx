@@ -16,6 +16,8 @@
 #define GPUB_FRAME_BUFFER_WIDTH 1024
 #define GPUB_FRAME_BUFFER_HEIGHT 512
 
+#define GPUB_GS_SORT_FAST_OBJ(gs_obj) printf("sprite x, y, u, v = {%d, %d, %d, %d}\n", gs_obj->x, gs_obj->y, gs_obj->u, gs_obj->v)
+
 #define GPUB_SET_BRIGHTNESS(rgb_holder, brightness) rgb_holder->r = rgb_holder->g = rgb_holder->b =  brightness
 
 #define GPUB_SCREEN_WIDTH 256    // Width of screen
