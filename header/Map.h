@@ -32,7 +32,7 @@ typedef struct CollisionBlock {
 } CollisionBlock;
 
 typedef struct SpriteLayer {
-    GsSPRITE **sprite_regions;
+    GsSPRITE *regions;
     u_short amount;
     u_char prio;
     struct SpriteLayer *next;

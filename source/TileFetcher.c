@@ -53,7 +53,7 @@ GsSPRITE **tiles_get_gs_tile_sprites_mapped(GsSPRITE *tile_set, Tile_Map *map) {
         v = map->tile_height * to_tm_v_coord(id, map->tile_height);
 
         asmg_get_region(tile_set, sprites[i], x, y, u, v, map->tile_width, map->tile_height);
-        logr_log(INFO, "TileFetcher", "get_gs_tile_sprites_mapped", "Tile retrieved ID=%d, i=%d: {x:%d, y%d, u:%d, v:%d}", id, i, sprites[i]->x, sprites[i]->y, sprites[i]->u, sprites[i]->v);
+        logr_log(DEBUG, "TileFetcher", "get_gs_tile_sprites_mapped", "Tile retrieved ID=%d, i=%d: {x:%d, y%d, u:%d, v:%d}", id, i, sprites[i]->x, sprites[i]->y, sprites[i]->u, sprites[i]->v);
     }
     return sprites;
 }

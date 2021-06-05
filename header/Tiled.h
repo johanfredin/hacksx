@@ -49,19 +49,18 @@ typedef struct Layer_Data {
 
 typedef struct Tile_Layer {
     Layer_Data *data;
-    u_int height, width, id;
-    char *name, *type;
+    u_short height, width, id, x, y, prio;
+    char *name, *type, *layer_type;
     u_char visible;
-    int x, y;
     struct Tile_Layer *next;
 } Tile_Layer;
 
 typedef struct Tile_Map {
-    int width, height, tile_width, tile_height;
+    u_short width, height, tile_width, tile_height;
     Tile_Layer *layers;
     ObjectLayer_Bounds *bounds;
     ObjectLayer_Teleport *teleports;
-    u_char bounds_cnt;
+    u_char bounds_cnt, layers_cnt;
     u_char teleports_cnt;
     u_short offset_x, offset_y;
 } Tile_Map;

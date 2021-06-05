@@ -3,6 +3,7 @@
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);
 void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root);
+void add_additional_properties_to_layer(Tile_Layer *layer, JSON_Data *root);
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root);
 void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root);
 Tile_Map *malloc_tile_map();
@@ -79,6 +80,7 @@ void tiled_print_map(Tile_Map *map) {
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  height=%d ", map->height);
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  tile_width=%d ", map->tile_width);
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  tile_height=%d ", map->tile_height);
+    logr_log(INFO, "Tiled.c", "tiled_print_map", "  layers_cnt=%d ", map->layers_cnt);
     logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  layers=[ ");
     for (tile_layer = map->layers; tile_layer != NULL; tile_layer = tile_layer->next) {
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    { ");
@@ -90,6 +92,8 @@ void tiled_print_map(Tile_Map *map) {
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      width=%d ", tile_layer->width);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      height=%d ", tile_layer->height);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", tile_layer->visible);
+        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      layer_type=%s ", tile_layer->layer_type);
+        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      prio=%d ", tile_layer->prio);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
     }
     logr_log(DEBUG,"Tiled.c", "tiled_print_map", "  ] ");
@@ -126,6 +130,7 @@ void tiled_print_map(Tile_Map *map) {
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
     Tile_Layer *tl_root = MEM_MALLOC_3(Tile_Layer);
+    u_char layers_cnt = 1;  // We have already encountered a layer if we're in here so at least we know there is one.
     JSON_Data *jobj_curr;
     Tile_Layer *tl_curr, *tl_prev;
 
@@ -139,9 +144,9 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
             if (STREQ(key, "data")) {
                 add_data_to_layer(tl_curr, (JSON_Data *) value);
             } else if (STREQ(key, "height")) {
-                tl_curr->height = *(int *) value;
+                tl_curr->height = *(u_short *) value;
             } else if (STREQ(key, "id")) {
-                tl_curr->id = *(int *) value;
+                tl_curr->id = *(u_short *) value;
             } else if (STREQ(key, "name")) {
                 u_char is_bounds = STREQ((char *) value, "bounds");
                 u_char is_teleports = STREQ((char *) value, "teleports");
@@ -169,14 +174,17 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
             } else if (STREQ(key, "visible")) {
                 tl_curr->visible = *(u_char *) value;
             } else if (STREQ(key, "width")) {
-                tl_curr->width = *(int *) value;
+                tl_curr->width = *(u_short *) value;
             } else if (STREQ(key, "x")) {
-                tl_curr->x = *(int *) value;
+                tl_curr->x = *(u_short *) value;
             } else if (STREQ(key, "y")) {
-                tl_curr->y = *(int *) value;
+                tl_curr->y = *(u_short *) value;
+            } else if (STREQ(key, "properties")) {
+                add_additional_properties_to_layer(tl_curr, (JSON_Data *) value);
             }
         }
         if (jobj_curr->next != NULL) {
+            layers_cnt++;
             next = MEM_MALLOC_3(Tile_Layer);
         }
         tl_curr->next = next;
@@ -185,6 +193,7 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
 
     }
     tm->layers = tl_root;
+    tm->layers_cnt = layers_cnt;
 }
 
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root) {
@@ -296,6 +305,27 @@ void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root) {
             tm->offset_x = prop_value;
         } else if (STREQ(prop_name, "offset_y")) {
             tm->offset_y = prop_value;
+        }
+    }
+}
+
+void add_additional_properties_to_layer(Tile_Layer *layer, JSON_Data *root) {
+    JSON_Data *curr;
+    // Iterate properties array
+    for (curr = root; curr != NULL; curr = curr->next) {
+        JSON_Data *curr_props = (JSON_Data *) curr->value;
+
+        // Fetch the 2 properties needed in json object
+        char *prop_name = (char *) curr_props->value;
+        void *prop_value = curr_props->next->next->value;
+
+        // Validate that the property prop_value is actually 2 lanes down
+        TILED_VALIDATE_PROP(curr_props->key, curr_props->next->next->key)
+
+        if (STREQ(prop_name, "layer_type")) {
+            layer->layer_type = (char *) prop_value;
+        } else if (STREQ(prop_name, "prio")) {
+            layer->prio = *(u_short*) prop_value;
         }
     }
 }
