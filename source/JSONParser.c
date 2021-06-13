@@ -1,4 +1,10 @@
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "../header/JSONParser.h"
+#include "../header/StrUtils.h"
+#include "../header/MemUtils.h"
+#include "../header/MockPSXTypes.h"
 
 unsigned int idx;
 char *content = NULL;

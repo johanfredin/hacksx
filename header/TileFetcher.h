@@ -5,9 +5,8 @@
 #ifndef HACKSX_TILEFETCHER_H
 #define HACKSX_TILEFETCHER_H
 
-#include <MockPSXTypes.h>
-#include <Tiled.h>
+#include "Map.h"
 
-GsSPRITE **tiles_get_gs_tile_sprites_mapped(GsSPRITE *tile_set, Tile_Map *map);
+void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_set, Tile_Map *map);
 
 #endif //HACKSX_TILEFETCHER_H

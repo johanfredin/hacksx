@@ -1,5 +1,9 @@
 #include "../header/Logger.h"
 
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 char *get_level(unsigned char level) {
     switch (level) {
         case WARN:

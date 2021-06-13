@@ -1,7 +1,6 @@
 #ifndef PSX_GAME_OBJECT_H
 #define PSX_GAME_OBJECT_H
 
-#include "GPUBase.h"
 #include "MockPSXTypes.h"
 
 #define GOBJ_TYPE_PLAYER 0

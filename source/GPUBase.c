@@ -1,5 +1,6 @@
 #include "../header/GPUBase.h"
 
+#include "MemUtils.h"
 
 void gpub_init_screen() {
    // Mock

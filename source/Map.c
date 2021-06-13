@@ -1,4 +1,11 @@
-#include "../header/Map.h"
+#include <CdReader.h>
+#include <Tiled.h>
+#include <AssetManager.h>
+#include <TileFetcher.h>
+#include "GameObject.h"
+
+#include <GPUBase.h>
+#include <MemUtils.h>
 
 #define START_FRAME 0
 
@@ -9,27 +16,20 @@ u_char assets_count;
 u_char frame_cnt;
 u_char current_frame = START_FRAME;
 
-void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_file);
+void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
 RECT get_rect_with_offset(short x, short y, short w, short h, short x_offset, short y_offset);
 TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
 u_char set_level_assets(u_char level);
-SpriteLayer *load_layers(CdrData *img_data, Tile_Map *tile_map);
 
 void map_init(u_char level) {
     u_char i;
     assets_count = set_level_assets(level);
 
-    frames = MEM_CALLOC_3(10, Frame);
-    init_frame(&frames[frame_cnt++], "TILES_8.TIM", NULL, NULL, "SANDBOX.JSON");
-    // init_frame(&frames[frame_cnt++], "01BG.TIM", "01FG.TIM", "RAICHU.TIM", "0_1.JSON");
-    // init_frame(&frames[frame_cnt++], "10BG.TIM", "10FG.TIM", "RAICHU_2.TIM", "1_0.JSON");
-    // init_frame(&frames[frame_cnt++], "11BG.TIM", "11FG.TIM", "ALOLA.TIM", "1_1.JSON");
-    // init_frame(&frames[frame_cnt++], "YOLOBG.TIM", "YOLOFG.TIM", NULL, "04.JSON");
-    // init_frame(&frames[frame_cnt++], "1_TUNNEL.TIM", NULL, NULL, "05.JSON");
-    // init_frame(&frames[frame_cnt++], "1_H2.TIM", NULL, NULL, "06.JSON");
+    frames = MEM_CALLOC_3(1, Frame);
+    init_frame(&frames[frame_cnt++], cdr_find_data_entry("TILES_8.TIM", cdr_data_assets, assets_count), NULL, "SANDBOX.JSON");
 
     // Cleanup
     for (i = 0; i < assets_count; i++) {
@@ -49,39 +49,17 @@ u_char set_level_assets(u_char level) {
         cdr_data_assets[asset_cnt++] = cdr_read_file("SANDBOX.JSON");
         cdr_data_assets[asset_cnt++] = cdr_read_file("SB_BG.TIM");
         cdr_data_assets[asset_cnt++] = cdr_read_file("TILES_8.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("0_1.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("1_0.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("1_1.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("04.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("05.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("06.JSON");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("00BG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("00FG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("01BG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("01FG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("10BG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("11BG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("10FG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("11FG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("1_H2.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("1_TUNNEL.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("PSYDUCK.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("RAICHU.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("YOLOBG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("YOLOFG.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("RAICHU_2.TIM");
-        // cdr_data_assets[asset_cnt++] = cdr_read_file("ALOLA.TIM");
     }
     cdr_close();
     logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets read", asset_cnt);
     return asset_cnt;
 }
 
-void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_file) {
+void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file) {
     // Declarations --------------------------
     CdrData *bg_cdr_data, *json_cdr_data;
     u_long *content;
-    GsBG *gs_bg;
+    GsSPRITE *tile_set;
     JSON_Data *map_data;
     Tile_Map *tile_map;
     ObjectLayer_Bounds *curr_b;
@@ -97,21 +75,8 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     tile_map = tiled_populate_from_json(map_data);
 
     // INIT SPRITES -----------------------------------------------------------
-    bg_cdr_data = cdr_find_data_entry(bg, cdr_data_assets, assets_count);
-
-    // Test GS_BG
-    gs_bg = asmg_get_gs_bg(tile_map, bg_cdr_data);
-
-//    frame->bg = asmg_load_sprite_w_offset(bg_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_4, tile_map->offset_x, tile_map->offset_y); // BG can not be NULL so no check
-//    frame->sprite_layers = load_layers(bg_cdr_data, tile_map);
-//    if (fg != NULL) {
-//        CdrData *fg_cdr_data = cdr_find_data_entry(fg, cdr_data_assets, assets_count);
-//        frame->fg = asmg_load_sprite_w_offset(fg_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
-//    }
-//    if (gobj != NULL) {
-//        CdrData *gobj_cdr_data = cdr_find_data_entry(gobj, cdr_data_assets, assets_count);
-//        frame->game_object = gobj_init(asmg_load_sprite(gobj_cdr_data, 90, 120, 128, ASMG_COLOR_BITS_8), 16, 16, 1, 1, 100, GOBJ_TYPE_NPC);
-//    }
+    tile_set = asmg_load_sprite_w_offset(tileset_data, 0, 0, 128, ASMG_COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
+    tf_add_layers_to_frame(frame, tile_set, tile_map);
 
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
@@ -154,55 +119,6 @@ void init_frame(Frame *frame, char *bg, char *fg, char *gobj, char *json_map_fil
     tiled_free(tile_map);
 }
 
-//SpriteLayer *load_layers(CdrData *img_data, Tile_Map *tile_map) {
-//    u_short x, y, u, v, i;
-//    u_short map_w, map_h, map_tw, map_th, cols, rows;
-//    GsSPRITE *sprite;
-//    SpriteLayer *sprite_layers;
-//
-//    Layer_Data *curr = tile_map->layers->data; // Will be several sprite_layers in real life later!
-//
-//    // Calculate tiles amount on x and y axis
-//    map_tw = tile_map->tile_width;
-//    map_th = tile_map->tile_height;
-//    map_w = tile_map->width * map_tw;
-//    map_h = tile_map->height * map_th;
-//    cols = map_w / map_tw;
-//    rows = map_h / map_th;
-//
-//    sprite_layers = MEM_MALLOC_3(SpriteLayer);
-//    sprite_layers->regions = MEM_CALLOC_3_PTRS(cols * rows, GsSPRITE);
-//
-//    // We will need to fetch multiple sprite_layers later and figure out what goes where,
-//    // but for now just fetch the bg sprite
-//    sprite = asmg_load_sprite(img_data, 0, 0, 128, ASMG_COLOR_BITS_8);
-//    i = 0;
-//    v = 0;
-//    // Iterate frame tile by tile and fetch appropriate texture region from tile set
-//    for (y = 0; y < rows; y++, v += tile_map->tile_height) {
-//        for (x = 0, u = 0; x < cols; x++) {
-//            if (curr == NULL) {
-//                logr_log(ERROR, "Map.c", "load_layers", "Current layer data entry is null before end of loop, must be a mismatch, terminating...");
-//                exit(1);
-//            }
-//
-//            if (curr->id == 0) {
-//                logr_log(DEBUG, "Map.c", "load_layers", "id=0 data entry found at i=%d, skipping since 0=no tile", i);
-//            } else {
-//                GsSPRITE *region = MEM_MALLOC_3(GsSPRITE);
-//                // asmg_get_region(sprite, &sprite_layers->regions[i], u * curr->id, v, tile_map->tile_width, tile_map->tile_height);
-//                asmg_get_region(sprite, region, x * cols, y * rows, 0, 0, map_tw, map_th);
-//                LOGR_LOG_SPRITE(DEBUG, region);
-//                sprite_layers->regions[i] = region;
-//                i++;
-//            }
-//            curr = curr->next;
-//        }
-//    }
-//    logr_log(INFO, "Map.c", "load_layers", "%d sprites added", i);
-//    return sprite_layers;
-//}
-
 RECT get_rect(short x, short y, short w, short h) {
     RECT r = {x, y, w, h};
     logr_log(TRACE, "Map.c", "get_rect", "Coords assigned at {x:%d, y%d, w:%d, h:%d}", r.x, r.y, r.w, r.h);
@@ -222,19 +138,32 @@ TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short 
 }
 
 void map_draw(Player *player) {
+    u_short bg_i = 0, fg_i = 0;
     Frame *frame = &frames[current_frame];
     CollisionBlock *blocks = frame->collision_blocks;
     Teleport *teleports = frame->teleports;
 
-    if (frame->fg != NULL) {
-        GsSortFastSprite(frame->fg, gpub_curr_ot(), 0);
+    if (frame->bg_layers != NULL) {
+        for (bg_i = 0; bg_i < frame->n_layers_bg; bg_i++) {
+            u_short sprite_i;
+            SpriteLayer *sl = frame->bg_layers[bg_i];
+            for (sprite_i = 0; sprite_i < sl->sprites_cnt; sprite_i++) {
+                GsSortFastSprite(sl->sprites[sprite_i], gpub_curr_ot(), curr_);
+            }
+        }
     }
     if (frame->game_object != NULL) {
         gobj_draw(frame->game_object);
     }
     gobj_player_draw(player);
-    if (frame->bg != NULL) {
-        GsSortFastSprite(frame->bg, gpub_curr_ot(), 0);
+    if (frame->fg_layers != NULL) {
+        for (fg_i = 0; fg_i < frame->n_layers_fg; fg_i++) {
+            u_short sprite_i;
+            SpriteLayer *sl = frame->fg_layers[fg_i];
+            for (sprite_i = 0; sprite_i < sl->sprites_cnt; sprite_i++) {
+                GsSortFastSprite(sl->sprites[sprite_i], gpub_curr_ot(), curr_);
+            }
+        }
     }
 
     if (GPUB_PRINT_COORDS) {

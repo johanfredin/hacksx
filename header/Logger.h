@@ -1,17 +1,13 @@
 #ifndef PSX_LOGGER_H
 #define PSX_LOGGER_H
 
-#include <stdarg.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #define ERROR 0
 #define WARN 1
 #define INFO 2
 #define DEBUG 3
 #define TRACE 4
 
-#define LOG_LEVEL DEBUG
+#define LOG_LEVEL INFO
 
 /*
  * Log a message at specified level
@@ -47,6 +43,8 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_x=%d", (&teleport)->dest_x, level); \
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_y=%d", (&teleport)->dest_y, level); \
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_frame=%d", (&teleport)->dest_frame, level)
+
+#define LOGR_LOG_GS_OBJ(level, gs_obj) logr_log(level, "Logger.h", "LOGR_LOG_GS_OBJ", "sprite x, y, u, v = {%d, %d, %d, %d}", gs_obj->x, gs_obj->y, gs_obj->u, gs_obj->v)
 
 #define LOGR_LOG_SPRITE(level, sprite) \
 logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", sprite->x, sprite->y, sprite->w, sprite->h, sprite->u, sprite->v)

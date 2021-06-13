@@ -1,5 +1,6 @@
+#include <MemUtils.h>
 #include "../header/AssetManager.h"
-
+#include "../header/GPUBase.h"
 
 void asmg_load_asset(VramAsset *asset, CdrData *cdr_data, u_short num_color_bits) {
     logr_log(INFO, "AssetManager.c", "asmg_load_asset", "Loading asset=%s", cdr_data->name);

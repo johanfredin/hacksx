@@ -1,6 +1,10 @@
+#include <StrUtils.h>
+#include <stdlib.h>
 #include "../header/CdReader.h"
 #include "../header/FileReader.h"
 
+#include "Logger.h"
+#include "MemUtils.h"
 
 void cdr_open() {
   // Mock
@@ -17,11 +21,11 @@ CdrData *cdr_create_data_entry(char *name) {
     return asset;
 }
 
-CdrData *cdr_find_data_entry(char* name, CdrData **assets, u_char assets_cnt) {
+CdrData *cdr_find_data_entry(char* name, CdrData **assets, unsigned char assets_cnt) {
     int i;
     for(i = 0; i < assets_cnt; i++) {
         if(STREQ(assets[i]->name, name)) {
-            logr_log(TRACE, "TRACE - Name=%s, found at index=%d", assets[i]->name, i);
+            logr_log(TRACE, "CdReader.c", "cdr_find_data_entry" "Name=%s, found at index=%d", assets[i]->name, i);
             return assets[i];
         }
     }
@@ -30,9 +34,9 @@ CdrData *cdr_find_data_entry(char* name, CdrData **assets, u_char assets_cnt) {
 }
 
 CdrData *cdr_read_file(char *file_path) {
-    CdrData *data = malloc(sizeof(CdrData));
+    CdrData *data = MEM_MALLOC_3(CdrData);
     data->name = file_path;
-    data->file = (u_long *) fr_get_content(file_path);
+    data->file = (unsigned long *) fr_get_content(file_path);
     return data;
 }
 

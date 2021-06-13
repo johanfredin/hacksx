@@ -5,13 +5,6 @@
 #ifndef PSX_SPIKE_PARSER_H
 #define PSX_SPIKE_PARSER_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "StrUtils.h"
-#include "MemUtils.h"
-#include "Logger.h"
-#include "MockPSXTypes.h"
-
 typedef struct {
     unsigned char integer: 1;
     unsigned char decimal: 1;

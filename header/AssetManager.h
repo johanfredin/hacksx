@@ -1,18 +1,9 @@
 #ifndef PSX_ASSET_MANAGER_H
 #define PSX_ASSET_MANAGER_H
 
-#include "GPUBase.h"
-#include "MemUtils.h"
-#include "Logger.h"
+#include "Tiled.h"
+#include "CdReader.h"
 #include "MockPSXTypes.h"
-#include "CdReader.h"
-#include "Tiled.h"
-
-#include "CdReader.h"
-#include "GPUBase.h"
-#include "Logger.h"
-#include "MemUtils.h"
-#include "Tiled.h"
 
 #define ASMG_ROT_ONE 4096
 #define ASMG_COLOR_BITS_4 4

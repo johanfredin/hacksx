@@ -1,3 +1,8 @@
+#include <stdarg.h>
+#include <Logger.h>
+#include <StrUtils.h>
+#include <MemUtils.h>
+#include <MockPSXTypes.h>
 #include "../header/Tiled.h"
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
@@ -51,17 +56,15 @@ Tile_Map *malloc_tile_map() {
 }
 
 void tiled_free(Tile_Map *tm) {
-    Tile_Layer *tile_layer;
-    tile_layer = tm->layers;
-    while (tile_layer != NULL) {
-        Tile_Layer *aux;
-        aux = tile_layer;
-        tile_layer = tile_layer->next;
-        MEM_FREE_LINKED_LIST(aux->data, Layer_Data);
+    while (tm->layers != NULL) {
+        Tile_Layer *aux = tm->layers;
+        tm->layers = tm->layers->next;
+        MEM_FREE_LINKED_LIST(aux->data, Layer_Data)
         MEM_FREE_3_AND_NULL(aux);
     }
-    MEM_FREE_LINKED_LIST(tm->bounds, ObjectLayer_Bounds);
-    MEM_FREE_LINKED_LIST(tm->teleports, ObjectLayer_Teleport);
+    MEM_FREE_3_AND_NULL(tm->layers);
+    MEM_FREE_LINKED_LIST(tm->bounds, ObjectLayer_Bounds)
+    MEM_FREE_LINKED_LIST(tm->teleports, ObjectLayer_Teleport)
     MEM_FREE_3_AND_NULL(tm);
 }
 
@@ -94,6 +97,7 @@ void tiled_print_map(Tile_Map *map) {
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", tile_layer->visible);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      layer_type=%s ", tile_layer->layer_type);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      prio=%d ", tile_layer->prio);
+        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      active_sprites_cnt=%d ", tile_layer->active_sprites_cnt);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
     }
     logr_log(DEBUG,"Tiled.c", "tiled_print_map", "  ] ");
@@ -332,11 +336,16 @@ void add_additional_properties_to_layer(Tile_Layer *layer, JSON_Data *root) {
 
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root) {
     Layer_Data *data_root = MEM_MALLOC_3(Layer_Data);
+    u_short active_sprites_cnt = 0;
     Layer_Data *data = data_root;
     JSON_Data *curr;
     for (curr = root; curr != NULL; curr = curr->next) {
         data->id = *(u_short *) curr->value;
+        if (data->id > 0) {
+            active_sprites_cnt++;
+        }
         MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(curr, data, Layer_Data)
     }
+    layer->active_sprites_cnt = active_sprites_cnt;
     layer->data = data_root;
 }

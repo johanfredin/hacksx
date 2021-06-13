@@ -1,11 +1,7 @@
 #ifndef PSX_GRIDMAP_H
 #define PSX_GRIDMAP_H
 
-#include "AssetManager.h"
-#include "CdReader.h"
 #include "GameObject.h"
-#include "JSONParser.h"
-#include "Tiled.h"
 
 /**
  * Allocates heap for passed in collision block, its bounds
@@ -32,18 +28,15 @@ typedef struct CollisionBlock {
 } CollisionBlock;
 
 typedef struct SpriteLayer {
-    GsSPRITE *regions;
-    u_short amount;
+    GsSPRITE **sprites;
+    u_short sprites_cnt;
+    char *type;
     u_char prio;
-    struct SpriteLayer *next;
 } SpriteLayer;
 
 typedef struct Frame {
-    u_char t_amount;
-    GsSPRITE *bg;
-    GsSPRITE *fg;
     SpriteLayer **bg_layers, **fg_layers;
-
+    u_char n_layers_bg, n_layers_fg, t_amount;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     GameObject *game_object;

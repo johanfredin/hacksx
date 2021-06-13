@@ -2,6 +2,10 @@
 // Created by lowrider on 2021-03-30.
 //
 
+#include <stdlib.h>
+#include <vcruntime_string.h>
+#include <Logger.h>
+#include <StrUtils.h>
 #include "../header/FileReader.h"
 
 FILE *fr_get_file(const char *fileName) {
