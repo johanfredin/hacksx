@@ -5,7 +5,7 @@
 #ifndef HACKSX_TILEFETCHER_H
 #define HACKSX_TILEFETCHER_H
 
-#include "Map.h"
+#include "Frames.h"
 
 void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_set, Tile_Map *map);
 

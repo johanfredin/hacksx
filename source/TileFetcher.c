@@ -7,7 +7,12 @@
 #include <StrUtils.h>
 #include "TileFetcher.h"
 
-int compareSpriteLayers(const void *a, const void *b);
+int compareSpriteLayers(const void *a, const void *b) {
+    SpriteLayer sa = *(SpriteLayer *) a;
+    SpriteLayer sb = *(SpriteLayer *) b;
+    int res = (int)(sa.prio - sb.prio);
+    return res;
+}
 
 u_short to_tm_u_coord(u_short id, u_short tileset_cols) {
     while (id >= tileset_cols) {
@@ -106,26 +111,20 @@ void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_set, Tile_Map *map) {
         } else {    // We have already thrown error above if layer not one of (bg, fg) so no point in checking again
             fg_layers[idx_fg++] = sl;
         }
-        MEM_FREE_3_AND_NULL(sl);
+//        MEM_FREE_3_AND_NULL(sl);
     }
-    MEM_FREE_3_AND_NULL(sprite_layers);
+//    MEM_FREE_3_AND_NULL(sprite_layers);
 
     // Now we have our 2 arrays, time to sort on prio so they will be drawn in correct order
-    qsort(bg_layers, n_layers_bg, sizeof(SpriteLayer), compareSpriteLayers);
-
-    if(n_layers_fg > 0) {   // Fg layers not required
-        qsort(fg_layers, n_layers_fg, sizeof(SpriteLayer), compareSpriteLayers);
-    }
+//    qsort(bg_layers, n_layers_bg, sizeof(SpriteLayer), compareSpriteLayers);
+//
+//    if(n_layers_fg > 0) {   // Fg layers not required
+//        qsort(fg_layers, n_layers_fg, sizeof(SpriteLayer), compareSpriteLayers);
+//    }
 
     // Finally give layers to frame
     frame->bg_layers = bg_layers;
     frame->fg_layers = fg_layers;
     frame->n_layers_fg = n_layers_fg;
     frame->n_layers_bg = n_layers_bg;
-}
-
-int compareSpriteLayers(const void *a, const void *b) {
-    SpriteLayer *sa = (SpriteLayer *) a;
-    SpriteLayer *sb = (SpriteLayer *) b;
-    return sa->prio - sb->prio;
 }

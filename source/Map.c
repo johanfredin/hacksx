@@ -6,6 +6,7 @@
 
 #include <GPUBase.h>
 #include <MemUtils.h>
+#include <Map.h>
 
 #define START_FRAME 0
 
@@ -45,7 +46,7 @@ u_char set_level_assets(u_char level) {
     logr_log(INFO, "Map.c", "set_level_assets", "*********************************");
     cdr_open();
     if (level == 1) {
-        cdr_data_assets = MEM_CALLOC_3_PTRS(24, CdrData);
+        cdr_data_assets = MEM_CALLOC_3_PTRS(3, CdrData);
         cdr_data_assets[asset_cnt++] = cdr_read_file("SANDBOX.JSON");
         cdr_data_assets[asset_cnt++] = cdr_read_file("SB_BG.TIM");
         cdr_data_assets[asset_cnt++] = cdr_read_file("TILES_8.TIM");
@@ -57,7 +58,7 @@ u_char set_level_assets(u_char level) {
 
 void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file) {
     // Declarations --------------------------
-    CdrData *bg_cdr_data, *json_cdr_data;
+    CdrData *json_cdr_data;
     u_long *content;
     GsSPRITE *tile_set;
     JSON_Data *map_data;
@@ -109,7 +110,7 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
         if (GPUB_DRAW_BOUNDS) {
             teleports[i].t_bound_lines = get_tile(x, y, curr_t->width, curr_t->height, 0, 0, 255);
         }
-        logr_log(INFO, "Map.c", "init_frame", "Dest x=%d y=%dframe=%dname=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
+        logr_log(INFO, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
     }
     frame->t_amount = teleports_cnt;
     frame->teleports = teleports;

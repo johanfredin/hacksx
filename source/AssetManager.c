@@ -2,8 +2,63 @@
 #include "../header/AssetManager.h"
 #include "../header/GPUBase.h"
 
+u_char get_tpage_color_bit_mode(u_short num_color_bits);
+u_char get_width_by_color_bits_mode(u_short num_color_bits);
+u_long get_attribute_by_color_bits_mode(u_short num_color_bits);
+
 void asmg_load_asset(VramAsset *asset, CdrData *cdr_data, u_short num_color_bits) {
-    logr_log(INFO, "AssetManager.c", "asmg_load_asset", "Loading asset=%s", cdr_data->name);
+    // Declarations
+    GsIMAGE *tim_data;
+    RECT *frame_buffer;
+    RECT *clut;
+    u_char *data;
+
+    // Definitions
+    u_short tw_multiplier = get_width_by_color_bits_mode(num_color_bits);
+    u_short color_mode = get_tpage_color_bit_mode(num_color_bits);
+    u_long sprite_attr = get_attribute_by_color_bits_mode(num_color_bits);
+
+    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "------------------------");
+    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Fetching asset=%s", cdr_data->name);
+    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Color bits=%d", num_color_bits);
+
+    // Load image data
+    data = (u_char *)cdr_data->file;
+
+    tim_data = MEM_MALLOC_3(GsIMAGE);
+    GsGetTimInfo((u_long *)(data + 4), tim_data);
+
+    // MEM_MALLOC_3 resources
+    frame_buffer = MEM_MALLOC_3(RECT);
+    clut = MEM_MALLOC_3(RECT);
+
+    // Load image into gpu memory
+    frame_buffer->x = tim_data->px;
+    frame_buffer->y = tim_data->py;
+    frame_buffer->w = tim_data->pw;
+    frame_buffer->h = tim_data->ph;
+    LoadImage(frame_buffer, tim_data->pixel);
+    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Framebuffer coords assigned at {x:%d, y:%d, w:%d, h:%d}", frame_buffer->x, frame_buffer->y, frame_buffer->w, frame_buffer->h);
+
+    if (num_color_bits < ASMG_COLOR_BITS_16) {
+        // load clut into gpu memory
+        clut->x = tim_data->cx;
+        clut->y = tim_data->cy;
+        clut->w = tim_data->cw;
+        clut->h = tim_data->ch;
+        LoadImage(clut, tim_data->clut);
+        logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "CLUT coords assigned at {x:%d, y:%d, w:%d, h:%d}", clut->x, clut->y, clut->w, clut->h);
+    } else {
+        logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "16 bit mode so no CLUT");
+    }
+
+    MEM_FREE_3_AND_NULL(tim_data);
+    asset->clut = clut;
+    asset->frame_buffer = frame_buffer;
+    asset->is_clut_mode = num_color_bits < ASMG_COLOR_BITS_16;
+    asset->color_mode = color_mode;
+    asset->sprite_attr = sprite_attr;
+    asset->t_width_multiplier = tw_multiplier;
 }
 
 GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits) {
@@ -125,4 +180,39 @@ GsBG *asmg_get_gs_bg(Tile_Map *tm, CdrData *sprite_data) {
         }
     }
     return gs_bg;
+}
+
+u_char get_tpage_color_bit_mode(u_short num_color_bits) {
+    switch (num_color_bits) {
+        case ASMG_COLOR_BITS_4:
+            return 0;
+        case ASMG_COLOR_BITS_8:
+            return 1;
+        case ASMG_COLOR_BITS_16:
+            return 2;
+    }
+    return -1;
+}
+
+u_char get_width_by_color_bits_mode(u_short num_color_bits) {
+    switch (num_color_bits) {
+        case ASMG_COLOR_BITS_8:
+        default:
+            return 2;
+        case ASMG_COLOR_BITS_16:
+            return 1;
+    }
+    return num_color_bits;
+}
+
+u_long get_attribute_by_color_bits_mode(u_short num_color_bits) {
+    switch (num_color_bits) {
+        case ASMG_COLOR_BITS_4:
+            return 0x0000000;
+        case ASMG_COLOR_BITS_8:
+            return 0x1000000;
+        case ASMG_COLOR_BITS_16:
+            return 0x2000000;
+    }
+    return -1;
 }

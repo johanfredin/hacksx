@@ -27,4 +27,4 @@ add_executable(hacksx
         source/GPUBase.c
         source/GameObject.c
         source/AssetManager.c
-        source/Logger.c source/MockPSXTypes.c source/TileFetcher.c header/TileFetcher.h)
+        source/Logger.c source/MockPSXTypes.c source/TileFetcher.c header/TileFetcher.h header/Frames.h)

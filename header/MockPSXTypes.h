@@ -17,7 +17,6 @@ void FntPrint(char *c, ...);
 
 u_short GetTPage(int tp, int abr, int x, int y);
 u_short GetClut(int x, int y);
-
 u_long PadRead(u_long btn);
 
 typedef struct {
@@ -30,6 +29,16 @@ typedef struct {
     short x0, y0;
     short w, h;
 } TILE;
+
+typedef struct GsIMAGE {
+    unsigned long pmode;
+    short px, py;
+    unsigned short pw, ph;
+    unsigned long *pixel;
+    short cx, cy;
+    unsigned short cw, ch;
+    unsigned long *clut;
+} GsIMAGE;
 
 typedef struct GsSPRITE {
     unsigned long attribute;
@@ -75,6 +84,8 @@ typedef struct GsBG {
     long rotate;
 } GsBG;
 
+void GsGetTimInfo(unsigned long *im, GsIMAGE *tim);
+extern int LoadImage(RECT *rect, u_long *p);
 
 #define DrawPrim(tile) \
 logr_log(INFO, "MockPSXTypes.h", "DrawPrim", "Drawing Primes")
