@@ -147,9 +147,9 @@ void map_draw(Player *player) {
     if (frame->bg_layers != NULL) {
         for (bg_i = 0; bg_i < frame->n_layers_bg; bg_i++) {
             u_short sprite_i;
-            SpriteLayer *sl = frame->bg_layers[bg_i];
-            for (sprite_i = 0; sprite_i < sl->sprites_cnt; sprite_i++) {
-                GsSortFastSprite(sl->sprites[sprite_i], gpub_curr_ot(), curr_);
+            SpriteLayer sl = frame->bg_layers[bg_i];
+            for (sprite_i = 0; sprite_i < sl.sprites_cnt; sprite_i++) {
+                GsSortFastSprite(sl.sprites[sprite_i], gpub_curr_ot(), curr_);
             }
         }
     }
@@ -160,9 +160,9 @@ void map_draw(Player *player) {
     if (frame->fg_layers != NULL) {
         for (fg_i = 0; fg_i < frame->n_layers_fg; fg_i++) {
             u_short sprite_i;
-            SpriteLayer *sl = frame->fg_layers[fg_i];
-            for (sprite_i = 0; sprite_i < sl->sprites_cnt; sprite_i++) {
-                GsSortFastSprite(sl->sprites[sprite_i], gpub_curr_ot(), curr_);
+            SpriteLayer sl = frame->fg_layers[fg_i];
+            for (sprite_i = 0; sprite_i < sl.sprites_cnt; sprite_i++) {
+                GsSortFastSprite(sl.sprites[sprite_i], gpub_curr_ot(), curr_);
             }
         }
     }

@@ -24,16 +24,19 @@ typedef struct SpriteLayer {
     GsSPRITE **sprites;
     u_short sprites_cnt;
     char *type;
-    u_char prio;
+    u_short prio;
+    struct SpriteLayer *next;
 } SpriteLayer;
 
 typedef struct Frame {
-    SpriteLayer **bg_layers, **fg_layers;
+    SpriteLayer *bg_layers, *fg_layers;
     u_char n_layers_bg, n_layers_fg, t_amount;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     GameObject *game_object;
 } Frame;
 
+void frames_insert_sorted(SpriteLayer **root, u_short prio);
+void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
 #endif //HACKSX_FRAMES_H
