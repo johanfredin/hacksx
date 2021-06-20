@@ -19,7 +19,6 @@ char *get_level(unsigned char level) {
         default:
             logr_log(ERROR, "Logger.c", "get_level", "Unknown log level=%d, shutting down...", level);
             exit(1);
-            break;
     }
 }
 

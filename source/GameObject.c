@@ -1,6 +1,9 @@
-#include <MemUtils.h>
 #include "../header/GameObject.h"
 #include "../header/GPUBase.h"
+#include "../header/MemUtils.h"
+#include "../header/Logger.h"
+
+#include <LIBETC.H>
 
 /**
  * Update the Heading struct of the passed in game object

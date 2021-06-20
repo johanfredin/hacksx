@@ -1,7 +1,10 @@
 #ifndef PSX_GAME_OBJECT_H
 #define PSX_GAME_OBJECT_H
 
-#include "MockPSXTypes.h"
+#include <SYS/TYPES.H>
+#include <LIBGTE.H>
+#include <LIBGPU.H>
+#include <LIBGS.H>
 
 #define GOBJ_TYPE_PLAYER 0
 #define GOBJ_TYPE_NPC 1

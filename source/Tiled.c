@@ -1,9 +1,8 @@
-#include <stdarg.h>
-#include <Logger.h>
-#include <StrUtils.h>
-#include <MemUtils.h>
-#include <MockPSXTypes.h>
 #include "../header/Tiled.h"
+#include "../header/Logger.h"
+#include "../header/StrUtils.h"
+#include "../header/MemUtils.h"
+#include "../header/Logger.h"
 
 void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);

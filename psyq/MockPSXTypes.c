@@ -1,8 +1,13 @@
 #include <stdarg.h>
-#include "../header/MockPSXTypes.h"
+#include "SYS/TYPES.h"
+#include "LIBGPU.h"
+#include "LIBETC.h"
+#include "LIBGTE.h"
+#include "LIBGS.h"
 
-void FntPrint(char *c, ...) {
+extern int FntPrint(char msg, ...) {
     logr_log(INFO, "MockPSXTypes.c", "FntPrint", "FNT print...");
+    return 1;
 }
 
 u_long PadRead(u_long btn) {
@@ -26,4 +31,8 @@ void GsGetTimInfo(unsigned long *im, GsIMAGE *tim) {
 
 extern int LoadImage(RECT *rect, u_long *p) {
     return 1;
+}
+
+extern void SetTile(TILE *p) {
+    // mock
 }

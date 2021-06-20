@@ -1,9 +1,10 @@
-//
-// Created by lowrider on 6/13/2021.
-//
+#ifndef PSX_FRAMES_H
+#define PSX_FRAMES_H
 
-#ifndef HACKSX_FRAMES_H
-#define HACKSX_FRAMES_H
+#include <SYS/TYPES.H>
+#include <LIBGTE.H>
+#include <LIBGPU.H>
+#include <LIBGS.H>
 
 #include "GameObject.h"
 
@@ -23,20 +24,18 @@ typedef struct CollisionBlock {
 typedef struct SpriteLayer {
     GsSPRITE **sprites;
     u_short sprites_cnt;
-    char *type;
     u_short prio;
     struct SpriteLayer *next;
 } SpriteLayer;
 
 typedef struct Frame {
     SpriteLayer *bg_layers, *fg_layers;
-    u_char n_layers_bg, n_layers_fg, t_amount;
+    u_char t_amount;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     GameObject *game_object;
 } Frame;
 
-void frames_insert_sorted(SpriteLayer **root, u_short prio);
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
-#endif //HACKSX_FRAMES_H
+#endif

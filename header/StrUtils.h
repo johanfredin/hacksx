@@ -1,7 +1,3 @@
-//
-// Created by lowrider on 4/4/2021.
-//
-
 #ifndef PSX_STR_UTILS_H
 #define PSX_STR_UTILS_H
 

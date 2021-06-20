@@ -1,5 +1,5 @@
-#ifndef PSX_GRIDMAP_H
-#define PSX_GRIDMAP_H
+#ifndef PSX_MAP_H
+#define PSX_MAP_H
 
 #include "GameObject.h"
 
@@ -19,4 +19,4 @@ void map_init(u_char level);
 void map_tick(Player *player);
 void map_draw(Player *player);
 
-#endif // PSX_GRIDMAP_H
+#endif // PSX_MAP_H

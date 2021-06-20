@@ -1,4 +1,3 @@
-#include <MemUtils.h>
 #include "Frames.h"
 
 void frames_insert_beginning(SpriteLayer **root, SpriteLayer *new_layer) {

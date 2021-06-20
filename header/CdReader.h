@@ -1,6 +1,8 @@
 #ifndef PSX_CD_READER_H
 #define PSX_CD_READER_H
 
+#define CDR_SECTOR 2048
+
 typedef struct CdrData {
     char *name;
     unsigned long *file;

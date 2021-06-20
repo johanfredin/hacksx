@@ -1,9 +1,13 @@
 #ifndef PSX_ASSET_MANAGER_H
 #define PSX_ASSET_MANAGER_H
 
+#include <SYS/TYPES.H>
+#include <LIBGTE.H>
+#include <LIBGPU.H>
+#include <LIBGS.H>
+
 #include "Tiled.h"
 #include "CdReader.h"
-#include "MockPSXTypes.h"
 
 #define ASMG_ROT_ONE 4096
 #define ASMG_COLOR_BITS_4 4
@@ -28,7 +32,5 @@ void asmg_load_asset(VramAsset *vram_asset, CdrData *cdr_data, u_short num_color
 void asmg_get_region(GsSPRITE *base, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h);
 GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits);
 GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits, u_short offset_x, u_short offset_y);
-GsSPRITE *asmg_load_sprite_with_s(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits, u_short w, u_short h);
-GsBG *asmg_get_gs_bg(Tile_Map *tm, CdrData *sprite_data);
 
 #endif // PSX_ASSET_MANAGER_H

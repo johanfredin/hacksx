@@ -3,9 +3,10 @@ project(hacksx C)
 
 set(CMAKE_C_STANDARD 11)
 
-include_directories(header)
+include_directories(header psyq)
 
 add_executable(hacksx
+        # Standard header files
         header/FileReader.h
         header/JSONParser.h
         header/CdReader.h
@@ -14,10 +15,23 @@ add_executable(hacksx
         header/Logger.h
         header/MemUtils.h
         header/StrUtils.h
-        header/MockPSXTypes.h
         header/GPUBase.h
         header/GameObject.h
         header/AssetManager.h
+        header/TileFetcher.h
+        header/Frames.h
+        header/LinkedListTutorial.h
+
+        # Mocked psyq header files
+        psyq/SYS/TYPES.h
+        psyq/LIBETC.h
+        psyq/LIBGPU.h
+        psyq/LIBGS.h
+        psyq/LIBGTE.h
+
+        # Standard sources
+        source/LinkedListTutorial.c
+        source/Frames.c
         source/CdReader.c
         source/Map.c
         source/FileReader.c
@@ -27,4 +41,8 @@ add_executable(hacksx
         source/GPUBase.c
         source/GameObject.c
         source/AssetManager.c
-        source/Logger.c source/MockPSXTypes.c source/TileFetcher.c header/TileFetcher.h header/Frames.h source/LinkedListTutorial.c header/LinkedListTutorial.h source/Frames.c)
+        source/Logger.c
+        source/TileFetcher.c
+
+        # Mocked psyq definitions
+        psyq/MockPSXTypes.c psyq/LIBDS.h)

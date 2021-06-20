@@ -1,12 +1,14 @@
-//
-// Created by lowrider on 5/31/2021.
-//
+#ifndef PSX_TILEFETCHER_H
+#define PSX_TILEFETCHER_H
 
-#ifndef HACKSX_TILEFETCHER_H
-#define HACKSX_TILEFETCHER_H
+#include <SYS/TYPES.H>
+#include <LIBGTE.H>
+#include <LIBGPU.H>
+#include <LIBGS.H>
 
 #include "Frames.h"
+#include "Tiled.h"
 
 void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_set, Tile_Map *map);
 
-#endif //HACKSX_TILEFETCHER_H
+#endif //PSX_TILEFETCHER_H

@@ -1,12 +1,14 @@
-#include <CdReader.h>
-#include <Tiled.h>
-#include <AssetManager.h>
-#include <TileFetcher.h>
-#include "GameObject.h"
+#include "../header/AssetManager.h"
+#include "../header/CdReader.h"
+#include "../header/GPUBase.h"
+#include "../header/GameObject.h"
+#include "../header/Logger.h"
+#include "../header/Map.h"
+#include "../header/MemUtils.h"
+#include "../header/TileFetcher.h"
+#include "../header/Tiled.h"
 
-#include <GPUBase.h>
-#include <MemUtils.h>
-#include <Map.h>
+#include <LIBETC.H>
 
 #define START_FRAME 0
 
@@ -19,7 +21,6 @@ u_char current_frame = START_FRAME;
 
 void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
-RECT get_rect_with_offset(short x, short y, short w, short h, short x_offset, short y_offset);
 TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
@@ -139,41 +140,41 @@ TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short 
 }
 
 void map_draw(Player *player) {
-    u_short bg_i = 0, fg_i = 0;
+    SpriteLayer *curr_sl;
     Frame *frame = &frames[current_frame];
-    CollisionBlock *blocks = frame->collision_blocks;
-    Teleport *teleports = frame->teleports;
 
     if (frame->bg_layers != NULL) {
-        for (bg_i = 0; bg_i < frame->n_layers_bg; bg_i++) {
-            u_short sprite_i;
-            SpriteLayer sl = frame->bg_layers[bg_i];
-            for (sprite_i = 0; sprite_i < sl.sprites_cnt; sprite_i++) {
-                GsSortFastSprite(sl.sprites[sprite_i], gpub_curr_ot(), curr_);
+        for (curr_sl = frame->bg_layers; curr_sl != NULL; curr_sl = curr_sl->next) {
+            u_short i;
+            for (i = 0; i < curr_sl->sprites_cnt; i++) {
+                GsSortFastSprite(curr_sl->sprites[i], gpub_curr_ot(), curr_sl);
             }
         }
     }
     if (frame->game_object != NULL) {
         gobj_draw(frame->game_object);
     }
-    gobj_player_draw(player);
+//    gobj_player_draw(player);
+
     if (frame->fg_layers != NULL) {
-        for (fg_i = 0; fg_i < frame->n_layers_fg; fg_i++) {
-            u_short sprite_i;
-            SpriteLayer sl = frame->fg_layers[fg_i];
-            for (sprite_i = 0; sprite_i < sl.sprites_cnt; sprite_i++) {
-                GsSortFastSprite(sl.sprites[sprite_i], gpub_curr_ot(), curr_);
+        for (curr_sl = frame->fg_layers; curr_sl != NULL; curr_sl = curr_sl->next) {
+            u_short i;
+            for (i = 0; i < curr_sl->sprites_cnt; i++) {
+                GsSortFastSprite(curr_sl->sprites[i], gpub_curr_ot(), curr_sl);
             }
         }
     }
 
     if (GPUB_PRINT_COORDS) {
+        CollisionBlock *blocks = frame->collision_blocks;
         FntPrint("Current framee=%d\n", current_frame);
         FntPrint("Blocks in frame=%d\n", blocks->amount);
         FntPrint("Teleports in frame=%d\n", frame->t_amount);
     }
 
     if (GPUB_DRAW_BOUNDS) {
+        CollisionBlock *blocks = frame->collision_blocks;
+        Teleport *teleports = frame->teleports;
         int blockIdx = 0, t_idx = 0;
         while (blockIdx < blocks->amount) {
             DrawPrim(&blocks->cb_bound_lines[blockIdx]);

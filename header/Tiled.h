@@ -1,53 +1,10 @@
-//
-// Created by lowrider on 2021-03-22.
-//
-
 #ifndef PSX_SPIKE_TILED_H
 #define PSX_SPIKE_TILED_H
 
+#include <SYS/TYPES.H>
+
 #include "JSONParser.h"
 
-typedef struct ObjectLayer_Bounds {
-    unsigned int width, height;
-    unsigned int id;
-    unsigned char visible;
-    unsigned int x, y;
-    struct ObjectLayer_Bounds *next;
-} ObjectLayer_Bounds;
-
-typedef struct ObjectLayer_Teleport {
-    unsigned int width, height;
-    unsigned int id;
-    unsigned char visible;
-    unsigned int x, y;
-    short dest_x, dest_y;
-    unsigned char dest_frame;
-    struct ObjectLayer_Teleport *next;
-} ObjectLayer_Teleport;
-
-
-typedef struct Layer_Data {
-    unsigned short id;
-    struct Layer_Data *next;
-} Layer_Data;
-
-typedef struct Tile_Layer {
-    Layer_Data *data;
-    unsigned short height, width, id, x, y, prio, active_sprites_cnt;
-    char *name, *type, *layer_type;
-    unsigned char visible;
-    struct Tile_Layer *next;
-} Tile_Layer;
-
-typedef struct Tile_Map {
-    unsigned short width, height, tile_width, tile_height;
-    Tile_Layer *layers;
-    ObjectLayer_Bounds *bounds;
-    ObjectLayer_Teleport *teleports;
-    unsigned char bounds_cnt, layers_cnt;
-    unsigned char teleports_cnt;
-    unsigned short offset_x, offset_y;
-} Tile_Map;
 
 /**
  * Make sure that passed in key=&quot;name&quot;<br>
@@ -55,15 +12,57 @@ typedef struct Tile_Map {
  * @param key key to check
  * @param val value to check
  */
-#define TILED_VALIDATE_PROP(key, val) \
-    if(!(STREQ(key, "name"))) { \
-        logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='name' expected here, instead was=%s, exiting...", key); \
-        exit(1); \
-    }                                     \
-    if(!(STREQ(val, "value"))) { \
+#define TILED_VALIDATE_PROP(key, val)                                                                                               \
+    if (!(STREQ(key, "name"))) {                                                                                                    \
+        logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='name' expected here, instead was=%s, exiting...", key);    \
+        exit(1);                                                                                                                    \
+    }                                                                                                                               \
+    if (!(STREQ(val, "value"))) {                                                                                                   \
         logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='value' expected here, instead was='%s', exiting...", val); \
-        exit(1); \
+        exit(1);                                                                                                                    \
     }
+
+typedef struct ObjectLayer_Bounds {
+    u_int width, height;
+    u_int id;
+    u_char visible;
+    u_int x, y;
+    struct ObjectLayer_Bounds *next;
+} ObjectLayer_Bounds;
+
+typedef struct ObjectLayer_Teleport {
+    u_int width, height;
+    u_int id;
+    u_char visible;
+    u_int x, y;
+    short dest_x, dest_y;
+    u_char dest_frame;
+    struct ObjectLayer_Teleport *next;
+} ObjectLayer_Teleport;
+
+typedef struct Layer_Data {
+    u_short id;
+    struct Layer_Data *next;
+} Layer_Data;
+
+typedef struct Tile_Layer {
+    Layer_Data *data;
+    u_short height, width, id, x, y, prio, active_sprites_cnt;
+    char *name, *type, *layer_type;
+    u_char visible;
+    struct Tile_Layer *next;
+} Tile_Layer;
+
+typedef struct Tile_Map {
+    u_short width, height, tile_width, tile_height;
+    Tile_Layer *layers;
+    ObjectLayer_Bounds *bounds;
+    ObjectLayer_Teleport *teleports;
+    u_char bounds_cnt, layers_cnt;
+    u_char teleports_cnt;
+    u_short offset_x, offset_y;
+} Tile_Map;
+
 
 /**
  * Populates a new Tile_Map type from JSON data received. This function allocates

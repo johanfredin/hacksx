@@ -1,7 +1,10 @@
 #ifndef PSX_GPU_BASE_H
 #define PSX_GPU_BASE_H
 
-#include "MockPSXTypes.h"
+#include <SYS/TYPES.H>
+#include <LIBGTE.H>
+#include <LIBGPU.H>
+#include <LIBGS.H>
 
 // Constants
 #define GPUB_NUM_BUFFERS 2

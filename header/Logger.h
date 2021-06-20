@@ -1,11 +1,12 @@
 #ifndef PSX_LOGGER_H
 #define PSX_LOGGER_H
 
-#define ERROR 0
-#define WARN 1
-#define INFO 2
-#define DEBUG 3
-#define TRACE 4
+#define OFF 0
+#define ERROR 1
+#define WARN 2
+#define INFO 3
+#define DEBUG 4
+#define TRACE 5
 
 #define LOG_LEVEL INFO
 
