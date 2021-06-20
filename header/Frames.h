@@ -30,7 +30,7 @@ typedef struct SpriteLayer {
 
 typedef struct Frame {
     SpriteLayer *bg_layers, *fg_layers;
-    u_char t_amount;
+    u_char t_amount, offset_x, offset_y;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     GameObject *game_object;

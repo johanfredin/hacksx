@@ -19,11 +19,7 @@
 
 #define GPUB_GS_SORT_FAST_OBJ(gs_obj) printf("sprite x, y, u, v = {%d, %d, %d, %d}\n", gs_obj->x, gs_obj->y, gs_obj->u, gs_obj->v)
 
-
 #define GPUB_SET_BRIGHTNESS(rgb_holder, brightness) rgb_holder->r = rgb_holder->g = rgb_holder->b =  brightness
-
-#define GPUB_SCREEN_WIDTH 256    // Width of screen
-#define GPUB_SCREEN_HEIGHT 256   // Height of screen
 
 #define GPUB_BG_COLOR_R 0
 
@@ -37,9 +33,24 @@
 
 
 // Prototypes
-void gpub_init_screen();
+void gpub_init_screen(u_short screen_w, u_short screen_h, u_char region_mode);
 void gpub_display();
 void gpub_clear_display();
+void gpub_display_and_clear();
 GsOT* gpub_curr_ot();
+
+/**
+ * Get the width of the screen. if width have not been set yet in gpub_init_screen. Program will exit
+ * @return the width of the screen if gpub_init_screen has been called
+ */
+u_short gpub_screen_w();
+/**
+ * Get the height of the screen. if height have not been set yet in gpub_init_screen. Program will exit
+ * @return the height of the screen if gpub_init_screen has been called
+ */
+u_short gpub_screen_h();
+
+extern u_short gpub_gs_prio;
+
 
 #endif // PSX_GPU_BASE_H

@@ -31,7 +31,7 @@ void map_init(u_char level) {
     assets_count = set_level_assets(level);
 
     frames = MEM_CALLOC_3(1, Frame);
-    init_frame(&frames[frame_cnt++], cdr_find_data_entry("TILES_8.TIM", cdr_data_assets, assets_count), NULL, "SANDBOX.JSON");
+    init_frame(&frames[frame_cnt++], cdr_find_data_entry("TS_8HOUSE.TIM", cdr_data_assets, assets_count), NULL, "04.JSON");
 
     // Cleanup
     for (i = 0; i < assets_count; i++) {
@@ -48,9 +48,8 @@ u_char set_level_assets(u_char level) {
     cdr_open();
     if (level == 1) {
         cdr_data_assets = MEM_CALLOC_3_PTRS(3, CdrData);
-        cdr_data_assets[asset_cnt++] = cdr_read_file("SANDBOX.JSON");
-        cdr_data_assets[asset_cnt++] = cdr_read_file("SB_BG.TIM");
-        cdr_data_assets[asset_cnt++] = cdr_read_file("TILES_8.TIM");
+        cdr_data_assets[asset_cnt++] = cdr_read_file("04.JSON");
+        cdr_data_assets[asset_cnt++] = cdr_read_file("TS_8HOUSE.TIM");
     }
     cdr_close();
     logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets read", asset_cnt);
@@ -70,6 +69,10 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
     Teleport *teleports;
     u_char blocks_cnt, teleports_cnt, i;
 
+    // Map coords
+    u_short map_w, map_h;
+    u_char offset_x = 0, offset_y = 0;
+
     // Parse json file into tile map
     json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
     content = json_cdr_data->file;
@@ -77,8 +80,25 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
     tile_map = tiled_populate_from_json(map_data);
 
     // INIT SPRITES -----------------------------------------------------------
-    tile_set = asmg_load_sprite_w_offset(tileset_data, 0, 0, 128, ASMG_COLOR_BITS_8, tile_map->offset_x, tile_map->offset_y);
-    tf_add_layers_to_frame(frame, tile_set, tile_map);
+    tile_set = asmg_load_sprite(tileset_data, 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
+    tf_add_layers_to_frame(frame, tile_set, tile_map);                                      // Map tiles to frame
+
+    // Calc potential x and/or y offsets (e.g frame is smaller than screen w and/or h)
+    map_w = tile_map->width * tile_map->tile_width;
+    map_h = tile_map->height * tile_map->tile_height;
+
+    if (map_w < gpub_screen_w()) {
+        offset_x = (gpub_screen_w() - map_w) / 2;
+    }
+    if (map_h < gpub_screen_h()) {
+        offset_y = (gpub_screen_h() - map_h) / 2;
+    }
+
+    // Give potential offsets to frame.
+    frame->offset_x = offset_x;
+    frame->offset_y = offset_y;
+    logr_log(DEBUG, "Map.c", "init_frame", "frame offset_x=%d, offset_y=%d", offset_x, offset_y);
+
 
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
