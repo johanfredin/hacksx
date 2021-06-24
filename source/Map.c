@@ -124,8 +124,8 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
 
         teleports[i].origin = get_rect(x, y, curr_t->width, curr_t->height);
 
-        teleports[i].dest_x = (curr_t->dest_x == 0) ? -1 : curr_t->dest_x;
-        teleports[i].dest_y = (curr_t->dest_y == 0) ? -1 : curr_t->dest_y;
+        teleports[i].dest_x = curr_t->dest_x;
+        teleports[i].dest_y = curr_t->dest_y;
         teleports[i].dest_frame = curr_t->dest_frame;
 
         if (GPUB_DRAW_BOUNDS) {
@@ -315,11 +315,12 @@ void handle_teleport_collision(GameObject *gobj, Frame *frame) {
         if (right_col || leftCol || top_col || bottom_col) {
             switch (gobj->type) {
                 case GOBJ_TYPE_PLAYER:
-                    if (t.dest_x > -1) {
-                        gobj->sprite->x = t.dest_x;
+                    if (t.dest_x > 0) {
+                        gobj->sprite->x = t.dest_x + frame->offset_x;
                     }
-                    if (t.dest_y > -1) {
-                        gobj->sprite->y = t.dest_y;
+                    if (t.dest_y > 0) {
+
+                        gobj->sprite->y = t.dest_y + frame->offset_y;
                     }
                     if (frame->game_object != NULL && frame->game_object->type == GOBJ_TYPE_NPC) {
                         GOBJ_RESET_POS(frame->game_object);
@@ -336,7 +337,6 @@ void handle_teleport_collision(GameObject *gobj, Frame *frame) {
                     break;
             }
         }
-
         i++;
     }
 }

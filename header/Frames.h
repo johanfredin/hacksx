@@ -10,7 +10,7 @@
 
 typedef struct Teleport {
     RECT origin;
-    short dest_x, dest_y;
+    u_short dest_x, dest_y;
     TILE t_bound_lines; // Graphical representation of a block (if DebugMode)
     u_char dest_frame;  // frame array index of frame to change to when colliding with this teleport
 } Teleport;
