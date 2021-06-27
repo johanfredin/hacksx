@@ -3,33 +3,56 @@
     {
      "export":
         {
-         "format":"json"
+         "format":"json",
+         "target":"05.json"
         }
     },
  "height":4,
  "infinite":false,
  "layers":[
         {
-         "data":[3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 3221225746, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 242, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 122, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186, 186],
+         "data":[129, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 131, 129, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 130, 131, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74, 74],
          "height":4,
          "id":6,
          "name":"bg",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"layer_type",
+                 "type":"string",
+                 "value":"bg"
+                }, 
+                {
+                 "name":"prio",
+                 "type":"int",
+                 "value":0
+                }],
          "type":"tilelayer",
-         "visible":true,
-         "width":16,
+         "visible":false,
+         "width":20,
          "x":0,
          "y":0
         }, 
         {
-         "data":[0, 1076, 0, 1076, 0, 1076, 0, 1076, 0, 1076, 0, 1076, 0, 1076, 0, 0, 34, 1108, 51, 1108, 0, 1108, 0, 1108, 0, 1108, 0, 1108, 0, 1108, 0, 2147483682, 41, 0, 0, 0, 0, 480, 0, 0, 372, 0, 0, 589, 0, 0, 0, 2147483689, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "data":[0, 964, 0, 964, 0, 964, 0, 964, 0, 964, 0, 964, 0, 964, 0, 0, 0, 0, 0, 0, 0, 996, 0, 996, 0, 996, 0, 996, 0, 996, 0, 996, 0, 996, 0, 0, 0, 0, 0, 0, 459, 0, 0, 0, 0, 368, 0, 0, 260, 0, 0, 477, 0, 0, 0, 0, 0, 0, 0, 460, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":4,
          "id":9,
          "name":"bg2",
          "opacity":1,
+         "properties":[
+                {
+                 "name":"layer_type",
+                 "type":"string",
+                 "value":"bg"
+                }, 
+                {
+                 "name":"prio",
+                 "type":"int",
+                 "value":1
+                }],
          "type":"tilelayer",
          "visible":true,
-         "width":16,
+         "width":20,
          "x":0,
          "y":0
         }, 
@@ -43,6 +66,22 @@
                  "height":24,
                  "id":23,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":4
+                        }, 
+                        {
+                         "name":"dest_x",
+                         "type":"int",
+                         "value":156
+                        }, 
+                        {
+                         "name":"dest_y",
+                         "type":"int",
+                         "value":80
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -54,16 +93,32 @@
                  "height":24,
                  "id":24,
                  "name":"",
+                 "properties":[
+                        {
+                         "name":"dest_frame",
+                         "type":"int",
+                         "value":6
+                        }, 
+                        {
+                         "name":"dest_x",
+                         "type":"int",
+                         "value":96
+                        }, 
+                        {
+                         "name":"dest_y",
+                         "type":"int",
+                         "value":48
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":4,
-                 "x":252,
+                 "x":316,
                  "y":24
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }, 
@@ -80,23 +135,23 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":256,
+                 "width":320,
                  "x":0,
                  "y":0
                 }, 
                 {
-                 "height":4,
+                 "height":1,
                  "id":13,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":256,
+                 "width":320,
                  "x":0,
-                 "y":60
+                 "y":64
                 }, 
                 {
-                 "height":12,
+                 "height":16,
                  "id":17,
                  "name":"",
                  "rotation":0,
@@ -107,14 +162,14 @@
                  "y":48
                 }, 
                 {
-                 "height":12,
+                 "height":16,
                  "id":19,
                  "name":"",
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":4,
-                 "x":252,
+                 "x":316,
                  "y":48
                 }, 
                 {
@@ -141,7 +196,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":true,
+         "visible":false,
          "x":0,
          "y":0
         }],
@@ -152,12 +207,12 @@
         {
          "name":"offset_x",
          "type":"int",
-         "value":85
+         "value":0
         }, 
         {
          "name":"offset_y",
          "type":"int",
-         "value":0
+         "value":85
         }],
  "renderorder":"right-down",
  "tiledversion":"1.4.3",
@@ -165,18 +220,10 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"tilesetformattedupdate1.tsx"
-        }, 
-        {
-         "firstgid":85,
-         "source":"16x16extratiles.tsx"
-        }, 
-        {
-         "firstgid":113,
          "source":"tinySLATES [16x16px orthogonal tileset by Ivan Voirol].tsx"
         }],
  "tilewidth":16,
  "type":"map",
  "version":1.4,
- "width":16
+ "width":20
 }

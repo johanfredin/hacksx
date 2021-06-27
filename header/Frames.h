@@ -36,6 +36,7 @@ typedef struct Frame {
     GameObject *game_object;
 } Frame;
 
+Frame *frames_malloc();
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
 #endif

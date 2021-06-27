@@ -10,55 +10,69 @@
 
 #include <LIBETC.H>
 
-#define START_FRAME 0
+#define MAP_START_FRAME 0
 
 Frame *frames;
 CdrData **cdr_data_assets;
 
-u_char assets_count;
+u_char assets_cnt = 0;
 u_char frame_cnt;
-u_char current_frame = START_FRAME;
+u_char current_frame = MAP_START_FRAME;
 
-void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file);
+void init_frame(Frame *frame, char *tileset_file, char *gobj, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
 TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
-u_char set_level_assets(u_char level);
+void set_level_assets(u_char level);
 
 void map_init(u_char level) {
     u_char i;
-    assets_count = set_level_assets(level);
+    set_level_assets(level);
 
-    frames = MEM_CALLOC_3(1, Frame);
-    init_frame(&frames[frame_cnt++], cdr_find_data_entry("TS_8HOUSE.TIM", cdr_data_assets, assets_count), NULL, "04.JSON");
+    frames = MEM_CALLOC_3(8, Frame);
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "0_0.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "0_1.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "1_0.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "1_1.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8HOUSE.TIM", NULL, "04.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "05.JSON");
+    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "06.JSON");
 
     // Cleanup
-    for (i = 0; i < assets_count; i++) {
+    for (i = 0; i < assets_cnt; i++) {
         cdr_data_free(cdr_data_assets[i]);
     }
     MEM_FREE_3_AND_NULL(cdr_data_assets);
 }
 
-u_char set_level_assets(u_char level) {
-    u_char asset_cnt = 0;
+void set_level_assets(u_char level) {
     logr_log(INFO, "Map.c", "set_level_assets", "*********************************");
     logr_log(INFO, "Map.c", "set_level_assets", "* ADDING ASSETS FOR LEVEL NR %d *", level);
     logr_log(INFO, "Map.c", "set_level_assets", "*********************************");
     cdr_open();
     if (level == 1) {
-        cdr_data_assets = MEM_CALLOC_3_PTRS(3, CdrData);
-        cdr_data_assets[asset_cnt++] = cdr_read_file("04.JSON");
-        cdr_data_assets[asset_cnt++] = cdr_read_file("TS_8HOUSE.TIM");
+        cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
+        // Load tile sets
+        cdr_data_assets[assets_cnt++] = cdr_read_file("TS_8HOUSE.TIM");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("TS_8B.TIM");
+
+        // Load tile maps
+        cdr_data_assets[assets_cnt++] = cdr_read_file("0_0.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("0_1.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("1_0.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("1_1.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("04.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("05.JSON");
+        cdr_data_assets[assets_cnt++] = cdr_read_file("06.JSON");
     }
     cdr_close();
-    logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets read", asset_cnt);
-    return asset_cnt;
+    logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets loaded", assets_cnt);
 }
 
-void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_file) {
+void init_frame(Frame *frame, char *tileset_file, char *gobj, char *json_map_file) {
     // Declarations --------------------------
-    CdrData *json_cdr_data;
+    CdrData *json_cdr_data, *tileset_cdr_data;
     u_long *content;
     GsSPRITE *tile_set;
     JSON_Data *map_data;
@@ -74,14 +88,17 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
     u_char offset_x = 0, offset_y = 0;
 
     // Parse json file into tile map
-    json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_count);
+    json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_cnt);
+    logr_log(INFO, "Map.c", "init_frame", "JSON file=%s retrieved", json_map_file);
     content = json_cdr_data->file;
     map_data = jsonp_parse((char *)content);
     tile_map = tiled_populate_from_json(map_data);
 
     // INIT SPRITES -----------------------------------------------------------
-    tile_set = asmg_load_sprite(tileset_data, 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
-    tf_add_layers_to_frame(frame, tile_set, tile_map);                                      // Map tiles to frame
+    tileset_cdr_data = cdr_find_data_entry(tileset_file, cdr_data_assets, assets_cnt);
+    logr_log(DEBUG, "Map.c", "init_frame", "tileset file=%s retrieved", tileset_file);
+    tile_set = asmg_load_sprite(tileset_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
+    tf_add_layers_to_frame(frame, tile_set, tile_map);                                          // Map tiles to frame
 
     // Calc potential x and/or y offsets (e.g frame is smaller than screen w and/or h)
     map_w = tile_map->width * tile_map->tile_width;
@@ -131,7 +148,7 @@ void init_frame(Frame *frame, CdrData *tileset_data, char *gobj, char *json_map_
         if (GPUB_DRAW_BOUNDS) {
             teleports[i].t_bound_lines = get_tile(x, y, curr_t->width, curr_t->height, 0, 0, 255);
         }
-        logr_log(INFO, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
+        logr_log(DEBUG, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
     }
     frame->t_amount = teleports_cnt;
     frame->teleports = teleports;

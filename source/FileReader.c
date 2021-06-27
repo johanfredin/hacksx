@@ -20,11 +20,11 @@ FILE *fr_get_file(const char *fileName) {
 }
 
 char *fr_get_content(const char* fileName) {
-    char *dot = strrchr(fileName, '.');
-    if(dot && STREQ(dot, ".TIM")) {
-        logr_log(WARN, "FileReader.c", "fr_get_content", "Skipping TIM files in hacksx, file skipped=%s", fileName);
-        return NULL;
-    }
+//    char *dot = strrchr(fileName, '.');
+//    if(dot && STREQ(dot, ".TIM")) {
+//        logr_log(WARN, "FileReader.c", "fr_get_content", "Skipping TIM files in hacksx, file skipped=%s", fileName);
+//        return NULL;
+//    }
 
     char *abs_path = _fullpath(NULL, NULL, 512);
     abs_path = strcat(abs_path, "\\..\\res\\");

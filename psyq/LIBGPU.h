@@ -24,7 +24,7 @@ logr_log(DEBUG, "LIBGPU.H", "DrawPrim", "Drawing prime")
 extern int LoadImage(RECT *rect, u_long *p);
 extern u_short GetClut(int x, int y);
 extern u_short GetTPage(int tp, int abr, int x, int y);
-extern int FntPrint(char msg, ...);
+extern int FntPrint(char *msg, ...);
 extern void SetTile(TILE *p);
 
 #endif

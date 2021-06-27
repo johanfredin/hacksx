@@ -7,15 +7,15 @@
 char *get_level(unsigned char level) {
     switch (level) {
         case WARN:
-            return "WARN";
+            return "WRN";
         case ERROR:
-            return "ERROR";
+            return "ERR";
         case INFO:
-            return "INFO";
+            return "INF";
         case DEBUG:
-            return "DEBUG";
+            return "DBG";
         case TRACE:
-            return "TRACE";
+            return "TRC";
         default:
             logr_log(ERROR, "Logger.c", "get_level", "Unknown log level=%d, shutting down...", level);
             exit(1);
