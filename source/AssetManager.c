@@ -62,57 +62,6 @@ void asmg_load_asset(VramAsset *asset, CdrData *cdr_data, u_short num_color_bits
     asset->t_width_multiplier = tw_multiplier;
 }
 
-void asmg_load_asset_with_s(VramAsset *asset, CdrData *cdr_data, u_short num_color_bits, u_short w, u_short h) {
-    // Declarations
-    GsIMAGE *tim_data;
-    RECT *frame_buffer;
-    RECT *clut;
-    u_char *data;
-
-    // Definitions
-    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "------------------------");
-    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Fetching asset=%s", cdr_data->name);
-    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Color bits=%d", num_color_bits);
-
-    // Load image data
-    data = (u_char *)cdr_data->file;
-
-    tim_data = MEM_MALLOC_3(GsIMAGE);
-    GsGetTimInfo((u_long *)(data + 4), tim_data);
-
-    // MEM_MALLOC_3 resources
-    frame_buffer = MEM_MALLOC_3(RECT);
-    clut = MEM_MALLOC_3(RECT);
-
-    // Load image into gpu memory
-    frame_buffer->x = tim_data->px;
-    frame_buffer->y = tim_data->py;
-    frame_buffer->w = w;
-    frame_buffer->h = h;
-    LoadImage(frame_buffer, tim_data->pixel);
-    logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "Framebuffer coords assigned at {x:%d, y:%d, w:%d, h:%d}", frame_buffer->x, frame_buffer->y, frame_buffer->w, frame_buffer->h);
-
-    if (num_color_bits < ASMG_COLOR_BITS_16) {
-        // load clut into gpu memory
-        clut->x = tim_data->cx;
-        clut->y = tim_data->cy;
-        clut->w = tim_data->cw;
-        clut->h = tim_data->ch;
-        LoadImage(clut, tim_data->clut);
-        logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "CLUT coords assigned at {x:%d, y:%d, w:%d, h:%d}", clut->x, clut->y, clut->w, clut->h);
-    } else {
-        logr_log(DEBUG, "AssetManager.c", "asmg_load_asset", "16 bit mode so no CLUT");
-    }
-
-    MEM_FREE_3_AND_NULL(tim_data);
-    asset->clut = clut;
-    asset->frame_buffer = frame_buffer;
-    asset->is_clut_mode = 1;
-    asset->color_mode = 1;
-    asset->sprite_attr = 0x1000000;
-    asset->t_width_multiplier = 2;
-}
-
 GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits) {
     VramAsset *asset;
     GsSPRITE *sprite;

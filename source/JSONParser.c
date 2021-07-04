@@ -174,11 +174,7 @@ void get_number(JSON_Data *entry) {
     float *f_ptr;
     int *i_ptr;
     if (strchr(num_str, '.')) {
-        logr_log(TRACE, "JSONParcer.c", "get_number", "Floating point not implemented for ps1 and will not be parsed, key=%s", entry->key);
-        // f_ptr = malloc(sizeof(float));
-        // *f_ptr = strtof(num_str, NULL);
-        // entry->value = f_ptr;
-        // entry->type.decimal = 1;
+        logr_log(TRACE, "JSONParser.c", "get_number", "Floating point numbers not supported for ps1 and will not be parsed, key=%s", entry->key);
     } else {
         i_ptr = MEM_MALLOC_3(int);
         *i_ptr = (int) strtol(num_str, NULL, 10);

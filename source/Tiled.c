@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "../header/Tiled.h"
 #include "../header/Logger.h"
 #include "../header/StrUtils.h"
@@ -8,6 +9,7 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root);
 void add_data_to_layer(Tile_Layer *layer, JSON_Data *root);
 void add_additional_properties_to_map(Tile_Map *tm, JSON_Data *root);
 void add_additional_properties_to_layer(Tile_Layer *layer, JSON_Data *root);
+void add_tile_sets_to_map(Tile_Map *tm, JSON_Data *root);
 void add_object_layers_to_map(Tile_Map *tm, JSON_Data *root);
 void add_teleport_layers_to_map(Tile_Map *tm, JSON_Data *root);
 Tile_Map *malloc_tile_map();
@@ -37,6 +39,8 @@ Tile_Map *tiled_populate_from_json(JSON_Data *root) {
             add_tile_layers_to_map(tm, (JSON_Data *) value);
         } else if (STREQ(key, "properties")) {
             add_additional_properties_to_map(tm, (JSON_Data *) value);
+        } else if(STREQ(key, "tilesets")) {
+            add_tile_sets_to_map(tm, (JSON_Data *) value);
         }
     }
     return tm;
@@ -69,6 +73,7 @@ void tiled_free(Tile_Map *tm) {
 
 void tiled_print_map(Tile_Map *map) {
     Tile_Layer *tile_layer;
+    Tile_Set *tile_set;
     ObjectLayer_Bounds *bounds_layer;
     ObjectLayer_Teleport *teleports_layer;
     logr_log(INFO, "Tiled.c", "tiled_print_map", "Map parsed from JSON");
@@ -126,6 +131,14 @@ void tiled_print_map(Tile_Map *map) {
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      dest_x=%d ", teleports_layer->dest_x);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      dest_y=%d ", teleports_layer->dest_y);
         logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
+    }
+    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  ] ");
+    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  tile_sets=[ ");
+    for (tile_set = map->tile_sets; tile_set != NULL; tile_set = tile_set->next) {
+        logr_log(INFO, "Tiled.c", "tiled_print_map", "    { ");
+        logr_log(INFO, "Tiled.c", "tiled_print_map", "       firstgid: %d", tile_set->firstgid);
+        logr_log(INFO, "Tiled.c", "tiled_print_map", "       source: %s", tile_set->source);
+        logr_log(INFO, "Tiled.c", "tiled_print_map", "    } ");
     }
     logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  ] ");
     logr_log(INFO, "Tiled.c", "tiled_print_map", "} ");
@@ -186,6 +199,7 @@ void add_tile_layers_to_map(Tile_Map *tm, JSON_Data *jobj_root) {
                 add_additional_properties_to_layer(tl_curr, (JSON_Data *) value);
             }
         }
+
         if (jobj_curr->next != NULL) {
             layers_cnt++;
             next = MEM_MALLOC_3(Tile_Layer);
@@ -347,4 +361,22 @@ void add_data_to_layer(Tile_Layer *layer, JSON_Data *root) {
     }
     layer->active_sprites_cnt = active_sprites_cnt;
     layer->data = data_root;
+}
+
+void add_tile_sets_to_map(Tile_Map *tm, JSON_Data *root) {
+    JSON_Data *json_curr ;
+    Tile_Set *ts_root = MEM_MALLOC_3(Tile_Set);
+    Tile_Set *ts_curr = ts_root;
+    for (json_curr = root; json_curr != NULL; json_curr = json_curr->next) {
+        JSON_Data *json_tileset;
+        for (json_tileset = (JSON_Data *) json_curr->value; json_tileset != NULL; json_tileset = json_tileset->next) {
+            if (STREQ(json_tileset->key, "firstgid")) {
+                ts_curr->firstgid = *(u_short *) json_tileset->value;
+            } else if (STREQ(json_tileset->key, "source")) {
+                ts_curr->source = (char *) json_tileset->value;
+            }
+        }
+        MEM_MALLOC_3_AND_MOVE_TO_NEXT_IF_MORE_DATA(json_curr, ts_curr, Tile_Set)
+    }
+    tm->tile_sets = ts_root;
 }

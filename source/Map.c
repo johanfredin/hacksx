@@ -15,11 +15,11 @@
 Frame *frames;
 CdrData **cdr_data_assets;
 
-u_char assets_cnt = 0;
+u_char assets_cnt = 0, tilesets_count = 0;
 u_char frame_cnt;
 u_char current_frame = MAP_START_FRAME;
 
-void init_frame(Frame *frame, char *tileset_file, char *gobj, char *json_map_file);
+void init_frame(Frame *frame, char *gobj, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
 TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
@@ -31,13 +31,7 @@ void map_init(u_char level) {
     set_level_assets(level);
 
     frames = MEM_CALLOC_3(8, Frame);
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "0_0.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "0_1.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "1_0.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "1_1.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8HOUSE.TIM", NULL, "04.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "05.JSON");
-    init_frame(&frames[frame_cnt++], "TS_8B.TIM", NULL, "06.JSON");
+    init_frame(&frames[frame_cnt++], NULL, "ts8_tl.json");
 
     // Cleanup
     for (i = 0; i < assets_cnt; i++) {
@@ -54,27 +48,26 @@ void set_level_assets(u_char level) {
     if (level == 1) {
         cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
         // Load tile sets
-        cdr_data_assets[assets_cnt++] = cdr_read_file("TS_8HOUSE.TIM");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("TS_8B.TIM");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tl.tim");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tr.tim");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_bl.tim");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_br.tim");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in1.tim");
+        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in2.tim");
 
         // Load tile maps
-        cdr_data_assets[assets_cnt++] = cdr_read_file("0_0.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("0_1.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("1_0.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("1_1.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("04.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("05.JSON");
-        cdr_data_assets[assets_cnt++] = cdr_read_file("06.JSON");
+        assets_cnt += tilesets_count;
+        cdr_data_assets[assets_cnt++] = cdr_read_file("ts8_tl.json");
     }
     cdr_close();
     logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets loaded", assets_cnt);
 }
 
-void init_frame(Frame *frame, char *tileset_file, char *gobj, char *json_map_file) {
+void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     // Declarations --------------------------
-    CdrData *json_cdr_data, *tileset_cdr_data;
+    CdrData *json_cdr_data;
     u_long *content;
-    GsSPRITE *tile_set;
+    GsSPRITE *tile_sets;
     JSON_Data *map_data;
     Tile_Map *tile_map;
     ObjectLayer_Bounds *curr_b;
@@ -93,12 +86,15 @@ void init_frame(Frame *frame, char *tileset_file, char *gobj, char *json_map_fil
     content = json_cdr_data->file;
     map_data = jsonp_parse((char *)content);
     tile_map = tiled_populate_from_json(map_data);
+    tiled_print_map(tile_map);
 
-    // INIT SPRITES -----------------------------------------------------------
-    tileset_cdr_data = cdr_find_data_entry(tileset_file, cdr_data_assets, assets_cnt);
-    logr_log(DEBUG, "Map.c", "init_frame", "tileset file=%s retrieved", tileset_file);
-    tile_set = asmg_load_sprite(tileset_cdr_data, 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
-    tf_add_layers_to_frame(frame, tile_set, tile_map);                                          // Map tiles to frame
+    // Load tilesets (frame may consist of multiple tilesets ----------------------------------------------------------
+    tile_sets = MEM_CALLOC_3(tilesets_count, GsSPRITE);
+    for(i = 0; i < tilesets_count; i++) {
+        logr_log(DEBUG, "Map.c", "init_frame", "tileset file=%s retrieved", cdr_data_assets[i]->name);
+        tile_sets[i] = *asmg_load_sprite(cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
+    }
+    tf_add_layers_to_frame(frame, tile_sets, tilesets_count, tile_map);    // Map tiles to frame
 
     // Calc potential x and/or y offsets (e.g frame is smaller than screen w and/or h)
     map_w = tile_map->width * tile_map->tile_width;

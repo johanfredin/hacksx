@@ -45,6 +45,12 @@ typedef struct Layer_Data {
     struct Layer_Data *next;
 } Layer_Data;
 
+typedef struct Tile_Set {
+    u_short firstgid;
+    char* source;
+    struct Tile_Set *next;
+} Tile_Set;
+
 typedef struct Tile_Layer {
     Layer_Data *data;
     u_short height, width, id, x, y, prio, active_sprites_cnt;
@@ -61,6 +67,7 @@ typedef struct Tile_Map {
     u_char bounds_cnt, layers_cnt;
     u_char teleports_cnt;
     u_short offset_x, offset_y;
+    Tile_Set *tile_sets;
 } Tile_Map;
 
 

@@ -8,7 +8,7 @@
 #define DEBUG 4
 #define TRACE 5
 
-#define LOG_LEVEL INFO
+#define LOG_LEVEL DEBUG
 
 /*
  * Log a message at specified level

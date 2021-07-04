@@ -9,6 +9,6 @@
 #include "Frames.h"
 #include "Tiled.h"
 
-void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_set, Tile_Map *map);
+void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_sets, u_char tileset_count, Tile_Map *map);
 
 #endif //PSX_TILEFETCHER_H
