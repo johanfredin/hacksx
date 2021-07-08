@@ -71,7 +71,7 @@ void tiled_free(Tile_Map *tm) {
     MEM_FREE_3_AND_NULL(tm);
 }
 
-void tiled_print_map(Tile_Map *map) {
+void tiled_print_map(u_char level, Tile_Map *map) {
     Tile_Layer *tile_layer;
     Tile_Set *tile_set;
     ObjectLayer_Bounds *bounds_layer;
@@ -88,59 +88,59 @@ void tiled_print_map(Tile_Map *map) {
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  tile_width=%d ", map->tile_width);
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  tile_height=%d ", map->tile_height);
     logr_log(INFO, "Tiled.c", "tiled_print_map", "  layers_cnt=%d ", map->layers_cnt);
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  layers=[ ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  layers=[ ");
     for (tile_layer = map->layers; tile_layer != NULL; tile_layer = tile_layer->next) {
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    { ");
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      name=%s ", tile_layer->name);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      type=%s ", tile_layer->type);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      id=%d ", tile_layer->id);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      x=%d ", tile_layer->x);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      y=%d ", tile_layer->y);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      width=%d ", tile_layer->width);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      height=%d ", tile_layer->height);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", tile_layer->visible);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      layer_type=%s ", tile_layer->layer_type);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      prio=%d ", tile_layer->prio);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      active_sprites_cnt=%d ", tile_layer->active_sprites_cnt);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "    { ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "      name=%s ", tile_layer->name);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      type=%s ", tile_layer->type);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      id=%d ", tile_layer->id);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      x=%d ", tile_layer->x);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      y=%d ", tile_layer->y);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      width=%d ", tile_layer->width);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      height=%d ", tile_layer->height);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      visible=%d ", tile_layer->visible);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      layer_type=%s ", tile_layer->layer_type);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      prio=%d ", tile_layer->prio);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      active_sprites_cnt=%d ", tile_layer->active_sprites_cnt);
+        logr_log(level, "Tiled.c", "tiled_print_map", "    } ");
     }
-    logr_log(DEBUG,"Tiled.c", "tiled_print_map", "  ] ");
-    logr_log(DEBUG,"Tiled.c", "tiled_print_map", "  bounds=[ ");
+    logr_log(level,"Tiled.c", "tiled_print_map", "  ] ");
+    logr_log(level,"Tiled.c", "tiled_print_map", "  bounds=[ ");
     for (bounds_layer = map->bounds; bounds_layer != NULL; bounds_layer = bounds_layer->next) {
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    { ");
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      id=%d ", bounds_layer->id);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", bounds_layer->visible);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      x=%d ", bounds_layer->x);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      y=%d ", bounds_layer->y);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      width=%d ", bounds_layer->width);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      height=%d ", bounds_layer->height);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", bounds_layer->visible);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "    { ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "      id=%d ", bounds_layer->id);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      visible=%d ", bounds_layer->visible);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      x=%d ", bounds_layer->x);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      y=%d ", bounds_layer->y);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      width=%d ", bounds_layer->width);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      height=%d ", bounds_layer->height);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      visible=%d ", bounds_layer->visible);
+        logr_log(level, "Tiled.c", "tiled_print_map", "    } ");
     }
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  ] ");
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  teleports=[ ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  ] ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  teleports=[ ");
     for (teleports_layer = map->teleports; teleports_layer != NULL; teleports_layer = teleports_layer->next) {
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    { ");
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      id=%d ", teleports_layer->id);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      visible=%d ", teleports_layer->visible);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      x=%d ", teleports_layer->x);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      y=%d ", teleports_layer->y);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      width=%d ", teleports_layer->width);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      height=%d ", teleports_layer->height);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      dest_frame=%d ", teleports_layer->dest_frame);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      dest_x=%d ", teleports_layer->dest_x);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "      dest_y=%d ", teleports_layer->dest_y);
-        logr_log(DEBUG, "Tiled.c", "tiled_print_map", "    } ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "    { ");
+        logr_log(level, "Tiled.c", "tiled_print_map", "      id=%d ", teleports_layer->id);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      visible=%d ", teleports_layer->visible);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      x=%d ", teleports_layer->x);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      y=%d ", teleports_layer->y);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      width=%d ", teleports_layer->width);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      height=%d ", teleports_layer->height);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      dest_frame=%d ", teleports_layer->dest_frame);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      dest_x=%d ", teleports_layer->dest_x);
+        logr_log(level, "Tiled.c", "tiled_print_map", "      dest_y=%d ", teleports_layer->dest_y);
+        logr_log(level, "Tiled.c", "tiled_print_map", "    } ");
     }
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  ] ");
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  tile_sets=[ ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  ] ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  tile_sets=[ ");
     for (tile_set = map->tile_sets; tile_set != NULL; tile_set = tile_set->next) {
         logr_log(INFO, "Tiled.c", "tiled_print_map", "    { ");
         logr_log(INFO, "Tiled.c", "tiled_print_map", "       firstgid: %d", tile_set->firstgid);
         logr_log(INFO, "Tiled.c", "tiled_print_map", "       source: %s", tile_set->source);
         logr_log(INFO, "Tiled.c", "tiled_print_map", "    } ");
     }
-    logr_log(DEBUG, "Tiled.c", "tiled_print_map", "  ] ");
+    logr_log(level, "Tiled.c", "tiled_print_map", "  ] ");
     logr_log(INFO, "Tiled.c", "tiled_print_map", "} ");
 }
 

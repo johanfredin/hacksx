@@ -12,8 +12,9 @@
 
 #define MAP_START_FRAME 0
 
-Frame *frames;
-CdrData **cdr_data_assets;
+Frame *map_frames;
+TF_TileSet **map_tile_sets;
+CdrData **map_cdr_data_assets;
 
 u_char assets_cnt = 0, tilesets_count = 0;
 u_char frame_cnt;
@@ -24,51 +25,63 @@ RECT get_rect(short x, short y, short w, short h);
 TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
-void set_level_assets(u_char level);
+void load_level_assets_from_cd(u_char level);
+void load_tilesets();
 
 void map_init(u_char level) {
     u_char i;
-    set_level_assets(level);
+    load_level_assets_from_cd(level);
+    load_tilesets();
 
-    frames = MEM_CALLOC_3(8, Frame);
-    init_frame(&frames[frame_cnt++], NULL, "ts8_tl.json");
+    map_frames = MEM_CALLOC_3(8, Frame);
+    init_frame(&map_frames[frame_cnt++], NULL, "ts8_tl.json");
 
     // Cleanup
     for (i = 0; i < assets_cnt; i++) {
-        cdr_data_free(cdr_data_assets[i]);
+        cdr_data_free(map_cdr_data_assets[i]);
     }
-    MEM_FREE_3_AND_NULL(cdr_data_assets);
+    MEM_FREE_3_AND_NULL(map_cdr_data_assets);
 }
 
-void set_level_assets(u_char level) {
-    logr_log(INFO, "Map.c", "set_level_assets", "*********************************");
-    logr_log(INFO, "Map.c", "set_level_assets", "* ADDING ASSETS FOR LEVEL NR %d *", level);
-    logr_log(INFO, "Map.c", "set_level_assets", "*********************************");
+void load_level_assets_from_cd(u_char level) {
+    logr_log(INFO, "Map.c", "load_level_assets_from_cd", "*********************************");
+    logr_log(INFO, "Map.c", "load_level_assets_from_cd", "* ADDING ASSETS FOR LEVEL NR %d *", level);
+    logr_log(INFO, "Map.c", "load_level_assets_from_cd", "*********************************");
     cdr_open();
     if (level == 1) {
-        cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
+        map_cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
         // Load tile sets
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tl.tim");
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tr.tim");
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_bl.tim");
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_br.tim");
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in1.tim");
-        cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in2.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tl.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_tr.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_bl.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_br.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in1.tim");
+        map_cdr_data_assets[tilesets_count++] = cdr_read_file("ts8_in2.tim");
 
         // Load tile maps
         assets_cnt += tilesets_count;
-        cdr_data_assets[assets_cnt++] = cdr_read_file("ts8_tl.json");
+        map_cdr_data_assets[assets_cnt++] = cdr_read_file("ts8_tl.json");
     }
     cdr_close();
-    logr_log(DEBUG, "Map.c", "set_level_assets", "%d assets loaded", assets_cnt);
+    logr_log(DEBUG, "Map.c", "load_level_assets_from_cd", "%d assets loaded", assets_cnt);
+}
+
+void load_tilesets() {
+    u_char i;
+    map_tile_sets = MEM_CALLOC_3_PTRS(tilesets_count, TF_TileSet);
+    for (i = 0; i < tilesets_count; i++) {
+        map_tile_sets[i]->sprite = asmg_load_sprite(map_cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);
+        map_tile_sets[i]->source = map_cdr_data_assets[i]->name;
+        logr_log(TRACE, "Map.c", "load_tilesets", "tileset=%s loaded", map_cdr_data_assets[i]->name);
+    }
+    logr_log(DEBUG, "Map.c", "load_tilesets", "%d tilesets loaded", tilesets_count);
 }
 
 void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     // Declarations --------------------------
     CdrData *json_cdr_data;
     u_long *content;
-    GsSPRITE *tile_sets;
-    JSON_Data *map_data;
+    JSON_Data *json_map_data;
     Tile_Map *tile_map;
     ObjectLayer_Bounds *curr_b;
     ObjectLayer_Teleport *curr_t;
@@ -81,20 +94,15 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     u_char offset_x = 0, offset_y = 0;
 
     // Parse json file into tile map
-    json_cdr_data = cdr_find_data_entry(json_map_file, cdr_data_assets, assets_cnt);
+    json_cdr_data = cdr_find_data_entry(json_map_file, map_cdr_data_assets, assets_cnt);
     logr_log(INFO, "Map.c", "init_frame", "JSON file=%s retrieved", json_map_file);
     content = json_cdr_data->file;
-    map_data = jsonp_parse((char *)content);
-    tile_map = tiled_populate_from_json(map_data);
-    tiled_print_map(tile_map);
+    json_map_data = jsonp_parse((char *)content);
+    tile_map = tiled_populate_from_json(json_map_data);
+    tiled_print_map(DEBUG, tile_map);
 
     // Load tilesets (frame may consist of multiple tilesets ----------------------------------------------------------
-    tile_sets = MEM_CALLOC_3(tilesets_count, GsSPRITE);
-    for(i = 0; i < tilesets_count; i++) {
-        logr_log(DEBUG, "Map.c", "init_frame", "tileset file=%s retrieved", cdr_data_assets[i]->name);
-        tile_sets[i] = *asmg_load_sprite(cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);    // Load tileset
-    }
-    tf_add_layers_to_frame(frame, tile_sets, tilesets_count, tile_map);    // Map tiles to frame
+    tf_add_layers_to_frame(frame, map_tile_sets, tilesets_count, tile_map);    // Map tiles to frame
 
     // Calc potential x and/or y offsets (e.g frame is smaller than screen w and/or h)
     map_w = tile_map->width * tile_map->tile_width;
@@ -150,7 +158,7 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     frame->teleports = teleports;
 
     // Housekeeping
-    jsonp_free(map_data);
+    jsonp_free(json_map_data);
     tiled_free(tile_map);
 }
 
@@ -174,7 +182,7 @@ TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short 
 
 void map_draw(Player *player) {
     SpriteLayer *curr_sl;
-    Frame *frame = &frames[current_frame];
+    Frame *frame = &map_frames[current_frame];
 
     if (frame->bg_layers != NULL) {
         for (curr_sl = frame->bg_layers; curr_sl != NULL; curr_sl = curr_sl->next) {
@@ -221,7 +229,7 @@ void map_draw(Player *player) {
 }
 
 void map_tick(Player *player) {
-    Frame *frame = &frames[current_frame];
+    Frame *frame = &map_frames[current_frame];
     // TEMP
     u_long btn = PadRead(1);
     if (btn & PADselect) {

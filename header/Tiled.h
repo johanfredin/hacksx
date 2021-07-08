@@ -79,7 +79,7 @@ typedef struct Tile_Map {
  */
 Tile_Map *tiled_populate_from_json(JSON_Data *root);
 
-void tiled_print_map(Tile_Map *map);
+void tiled_print_map(u_char level, Tile_Map *map);
 
 /**
  * Frees all the allocated memory in linked list passed in.

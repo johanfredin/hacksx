@@ -15,22 +15,19 @@ SpriteLayer *init_sprite_layer() {
 
 u_short to_tm_u_coord(u_short id, u_short cols, u_short tile_w);
 u_short to_tm_v_coord(u_short id, u_short rows, u_short tile_h);
-GsSPRITE *map_tile(u_char tileset_idx, u_short id, u_short x, u_short y, GsSPRITE *tile_sets, u_char tileset_count, Tile_Map *map);
+GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
 
-void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_sets, u_char tileset_count, Tile_Map *map) {
+void tf_add_layers_to_frame(Frame *frame, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map) {
     SpriteLayer *root_bg_layer = NULL;
     SpriteLayer *root_fg_layer = NULL;
     Tile_Layer *tl_curr;
 
-    logr_log(DEBUG, "TileFetcher.c", "tl_get_layers", "Entered function");
+    logr_log(TRACE, "TileFetcher.c", "tl_get_layers", "Entered function");
 
     // Iterate all layers
     for (tl_curr = map->layers; tl_curr != NULL; tl_curr = tl_curr->next) {
         Layer_Data *ld_curr;
-        u_short curr_col = 0;
-        u_short tiles_cnt = 0;
-        u_short rows_cnt = 0;
-        u_short active_tiles_cnt = 0;
+        u_short curr_col = 0, tiles_cnt = 0, rows_cnt = 0, active_tiles_cnt = 0;
         SpriteLayer *sl = init_sprite_layer();
         GsSPRITE **layer_sprites = MEM_CALLOC_3_PTRS(tl_curr->active_sprites_cnt, GsSPRITE);
 
@@ -45,19 +42,21 @@ void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_sets, u_char tileset_co
         for (ld_curr = tl_curr->data; ld_curr != NULL; ld_curr = ld_curr->next) {
             u_short id = ld_curr->id;
 
+            // Check if time for new row
             if (curr_col >= map->width) {
                 curr_col = 0;
                 rows_cnt += 1;
             }
 
             if (id == 0) {
-                logr_log(TRACE, "TileFetcher.c", "tl_get_layers", "skipping null tile at n_layers_total=%d", tiles_cnt);
+                logr_log(TRACE, "TileFetcher.c", "tl_get_layers", "skipping null tile at index=%d", tiles_cnt);
             } else {
                 u_short x = curr_col * map->tile_width;
                 u_short y = rows_cnt * map->tile_height;
+
                 --id;   // because they are 1 indexed in exported json, but tileset is 0 indexed
 
-                GsSPRITE *sprite = map_tile(0, id, x, y, tile_sets, tileset_count, map);
+                GsSPRITE *sprite = map_tile(id, x, y, tile_sets, n_tilesets, map);
                 if(sprite == NULL) {
                     logr_log(ERROR, "TileFetcher.c", "tl_get_layers", "Id of col=%d at layer=%s exceeds max dimensions for tilesets, terminating...", id, tl_curr->layer_type);
                     exit(1);
@@ -88,29 +87,41 @@ void tf_add_layers_to_frame(Frame *frame, GsSPRITE *tile_sets, u_char tileset_co
     frame->fg_layers = root_fg_layer;
 }
 
-GsSPRITE *map_tile(u_char tileset_idx, u_short id, u_short x, u_short y, GsSPRITE *tile_sets, u_char tileset_count, Tile_Map *map) {
-    u_short u, v;
-    GsSPRITE *curr_tileset = &tile_sets[tileset_idx];
-    curr_tileset->w = curr_tileset->h = 512;
-    u_short tileset_tw = curr_tileset->w / map->tile_width;
-    u_short tileset_th = curr_tileset->h / map->tile_height;
-    u_short max_dimension = tileset_tw * tileset_th;
-    GsSPRITE *tile;
+GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map) {
+    Tile_Set *curr_ts;
 
-    if(id >= max_dimension) {
-        if(tileset_idx >= tileset_count) {
-            return NULL; // Return NULL if we have exceeded all tilesets and still not within range
+    // Iterate tilesets that the tile map is using
+    for (curr_ts = map->tile_sets; curr_ts != NULL; curr_ts = curr_ts->next) {
+        u_char i;
+        // Find a matching GsSprite
+        for (i = 0; i < n_tilesets; i++) {
+            GsSPRITE *tile;
+            GsSPRITE *base = tile_sets[i];
+
+            base->w = base->h = 256; // Just for hacksx
+
+            u_short ts_tw = base->w / map->tile_width;
+            u_short ts_th = base->h / map->tile_height;
+            u_short ts_start_id = curr_ts->firstgid - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
+            u_short max_dimension = ts_start_id + (ts_tw * ts_th);
+
+            // Check if the current tile id in json is within the boundaries of this tile set
+            if(id >= ts_start_id && id < max_dimension) {
+                u_short adapted_id = id - ts_start_id;  // We need to subtract the start id from the tileset so it maps correctly within the tileset image
+
+                u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
+                u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
+
+                tile = MEM_MALLOC_3(GsSPRITE);
+
+                asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
+                LOGR_LOG_GS_OBJ(TRACE, tile);
+                return tile;
+            }
         }
-        return map_tile(++tileset_idx, id, x, y, tile_sets, tileset_count, map);
     }
 
-    tile = MEM_MALLOC_3(GsSPRITE);
-    u = to_tm_u_coord(id, tileset_tw, map->tile_width);
-    v = to_tm_v_coord(id, tileset_th, map->tile_height);
-
-    asmg_get_region(curr_tileset, tile, x, y, u, v, map->tile_width, map->tile_height);
-    LOGR_LOG_GS_OBJ(TRACE, tile);
-    return tile;
+    return NULL; // Return NULL if we have exceeded all tilesets and still not within range
 }
 
 u_short to_tm_u_coord(u_short id, u_short cols, u_short tile_w) {
