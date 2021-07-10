@@ -1,3 +1,5 @@
+#include <CTYPE.H>
+#include <stdio.h>
 #include "../header/TileFetcher.h"
 #include "../header/MemUtils.h"
 #include "../header/AssetManager.h"
@@ -57,7 +59,7 @@ void tf_add_layers_to_frame(Frame *frame, TF_TileSet **tile_sets, u_char n_tiles
                 --id;   // because they are 1 indexed in exported json, but tileset is 0 indexed
 
                 GsSPRITE *sprite = map_tile(id, x, y, tile_sets, n_tilesets, map);
-                if(sprite == NULL) {
+                if (sprite == NULL) {
                     logr_log(ERROR, "TileFetcher.c", "tl_get_layers", "Id of col=%d at layer=%s exceeds max dimensions for tilesets, terminating...", id, tl_curr->layer_type);
                     exit(1);
                 }
@@ -70,10 +72,10 @@ void tf_add_layers_to_frame(Frame *frame, TF_TileSet **tile_sets, u_char n_tiles
         sl->sprites = layer_sprites;
         sl->sprites_cnt = active_tiles_cnt;
         sl->prio = tl_curr->prio;
-        if(STREQ(tl_curr->layer_type, "bg")) {
+        if (STREQ(tl_curr->layer_type, "bg")) {
             frames_insert_sl_sorted(&root_bg_layer, sl);
             logr_log(DEBUG, "TileFetcher.c", "tf_add_layers_to_frame", "Bg layer with prio=%d added to frame", sl->prio);
-        } else if(STREQ(tl_curr->layer_type, "fg")) {
+        } else if (STREQ(tl_curr->layer_type, "fg")) {
             frames_insert_sl_sorted(&root_fg_layer, sl);
             logr_log(DEBUG, "TileFetcher.c", "tf_add_layers_to_frame", "Fg layer with prio=%d added to frame", sl->prio);
         } else {
@@ -93,34 +95,46 @@ GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_c
     // Iterate tilesets that the tile map is using
     for (curr_ts = map->tile_sets; curr_ts != NULL; curr_ts = curr_ts->next) {
         u_char i;
-        // Find a matching GsSprite
-        for (i = 0; i < n_tilesets; i++) {
-            GsSPRITE *tile;
-            GsSPRITE *base = tile_sets[i];
+        GsSPRITE *tile;
 
-            base->w = base->h = 256; // Just for hacksx
+        // Iterate our tf_tilesets to look for a matching image
+        for(i = 0; i < n_tilesets; i++) {
+            /*
+             * Compare source in current map tileset with the one for the image
+             * We do this by making a lower case comparison and checking if the
+             * full source path in our tiled json file contains the current image name (minus the .tim suffix)
+             */
+            char *tim_name = tile_sets[i]->source;
+            STR_TO_LOWERCASE(tim_name);
 
-            u_short ts_tw = base->w / map->tile_width;
-            u_short ts_th = base->h / map->tile_height;
-            u_short ts_start_id = curr_ts->firstgid - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
-            u_short max_dimension = ts_start_id + (ts_tw * ts_th);
+            char substr[16];
+            STR_READ_UNTIL(tim_name, substr, '.');
 
-            // Check if the current tile id in json is within the boundaries of this tile set
-            if(id >= ts_start_id && id < max_dimension) {
-                u_short adapted_id = id - ts_start_id;  // We need to subtract the start id from the tileset so it maps correctly within the tileset image
+            if (STR_CONTAINS(curr_ts->source, substr)) {
+                // We are now in the tileset sprite matching the current ts source, now check if the id is
+                // within the ts image bounds
 
-                u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
-                u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
+                GsSPRITE *base = tile_sets[i]->sprite;
+                base->w = base->h = 256; // Just for hacksx
 
-                tile = MEM_MALLOC_3(GsSPRITE);
+                u_short ts_tw = base->w / map->tile_width;
+                u_short ts_th = base->h / map->tile_height;
+                u_short ts_start_id = curr_ts->firstgid - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
+                u_short max_id = ts_start_id + (ts_tw * ts_th);
+                if(id >= ts_start_id && id <= max_id) {
+                    u_short adapted_id = id - ts_start_id;     // We need to subtract the start id from the tileset so it maps correctly within the tileset image
+                    u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
+                    u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
 
-                asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
-                LOGR_LOG_GS_OBJ(TRACE, tile);
-                return tile;
+                    tile = MEM_MALLOC_3(GsSPRITE);
+
+                    asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
+                    LOGR_LOG_GS_OBJ(DEBUG, tile);
+                    return tile;
+                }
             }
         }
     }
-
     return NULL; // Return NULL if we have exceeded all tilesets and still not within range
 }
 

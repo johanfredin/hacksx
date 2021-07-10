@@ -70,6 +70,7 @@ void load_tilesets() {
     u_char i;
     map_tile_sets = MEM_CALLOC_3_PTRS(tilesets_count, TF_TileSet);
     for (i = 0; i < tilesets_count; i++) {
+        map_tile_sets[i] = MEM_MALLOC_3(TF_TileSet);
         map_tile_sets[i]->sprite = asmg_load_sprite(map_cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);
         map_tile_sets[i]->source = map_cdr_data_assets[i]->name;
         logr_log(TRACE, "Map.c", "load_tilesets", "tileset=%s loaded", map_cdr_data_assets[i]->name);
