@@ -90,49 +90,32 @@ void tf_add_layers_to_frame(Frame *frame, TF_TileSet **tile_sets, u_char n_tiles
 }
 
 GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map) {
-    Tile_Set *curr_ts;
+    u_char i;
+    GsSPRITE *tile;
 
-    // Iterate tilesets that the tile map is using
-    for (curr_ts = map->tile_sets; curr_ts != NULL; curr_ts = curr_ts->next) {
-        u_char i;
-        GsSPRITE *tile;
+    // Iterate our tf_tilesets
+    for(i = 0; i < n_tilesets; i++) {
+        TF_TileSet *tf_tileset = tile_sets[i];
+        GsSPRITE *base = tf_tileset->sprite;
+        base->w = base->h = 256; // Just for hacksx
 
-        // Iterate our tf_tilesets to look for a matching image
-        for(i = 0; i < n_tilesets; i++) {
-            /*
-             * Compare source in current map tileset with the one for the image
-             * We do this by making a lower case comparison and checking if the
-             * full source path in our tiled json file contains the current image name (minus the .tim suffix)
-             */
-            char *tim_name = tile_sets[i]->source;
-            STR_TO_LOWERCASE(tim_name);
+        u_short ts_tw = base->w / map->tile_width;
+        u_short ts_th = base->h / map->tile_height;
 
-            char substr[16];
-            STR_READ_UNTIL(tim_name, substr, '.');
+        u_short ts_start_id = tf_tileset->start_id - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
 
-            if (STR_CONTAINS(curr_ts->source, substr)) {
-                // We are now in the tileset sprite matching the current ts source, now check if the id is
-                // within the ts image bounds
+        u_short max_id = ts_start_id + (ts_tw * ts_th);
 
-                GsSPRITE *base = tile_sets[i]->sprite;
-                base->w = base->h = 256; // Just for hacksx
+        if(id >= ts_start_id && id <= max_id) {
+            u_short adapted_id = id - ts_start_id;     // We need to subtract the start id from the tileset so it maps correctly within the tileset image
+            u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
+            u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
 
-                u_short ts_tw = base->w / map->tile_width;
-                u_short ts_th = base->h / map->tile_height;
-                u_short ts_start_id = curr_ts->firstgid - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
-                u_short max_id = ts_start_id + (ts_tw * ts_th);
-                if(id >= ts_start_id && id <= max_id) {
-                    u_short adapted_id = id - ts_start_id;     // We need to subtract the start id from the tileset so it maps correctly within the tileset image
-                    u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
-                    u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
+            tile = MEM_MALLOC_3(GsSPRITE);
 
-                    tile = MEM_MALLOC_3(GsSPRITE);
-
-                    asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
-                    LOGR_LOG_GS_OBJ(DEBUG, tile);
-                    return tile;
-                }
-            }
+            asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
+            LOGR_LOG_GS_OBJ(DEBUG, tile);
+            return tile;
         }
     }
     return NULL; // Return NULL if we have exceeded all tilesets and still not within range

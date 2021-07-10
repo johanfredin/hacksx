@@ -9,6 +9,7 @@
 #include "../header/Tiled.h"
 
 #include <LIBETC.H>
+#include <StrUtils.h>
 
 #define MAP_START_FRAME 0
 
@@ -26,6 +27,7 @@ TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short 
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
 void load_level_assets_from_cd(u_char level);
+void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets);
 void load_tilesets();
 
 void map_init(u_char level) {
@@ -101,6 +103,7 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     json_map_data = jsonp_parse((char *)content);
     tile_map = tiled_populate_from_json(json_map_data);
     tiled_print_map(DEBUG, tile_map);
+    transfer_firstgid_to_tf_tilesets(tile_map->tile_sets);
 
     // Load tilesets (frame may consist of multiple tilesets ----------------------------------------------------------
     tf_add_layers_to_frame(frame, map_tile_sets, tilesets_count, tile_map);    // Map tiles to frame
@@ -161,6 +164,36 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     // Housekeeping
     jsonp_free(json_map_data);
     tiled_free(tile_map);
+}
+
+void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets) {
+    Tile_Set *curr_ts;
+
+    // Iterate tilesets that the tile map is using
+    for (curr_ts = tile_sets; curr_ts != NULL; curr_ts = curr_ts->next) {
+        u_char i;
+        GsSPRITE *tile;
+
+        // Iterate our tf_tilesets to look for a matching image
+        for(i = 0; i < tilesets_count; i++) {
+            TF_TileSet *tf_tile_set = map_tile_sets[i];
+            /*
+             * Compare source in current map tileset with the one for the image
+             * We do this by making a lower case comparison and checking if the
+             * full source path in our tiled json file contains the current image name (minus the .tim suffix)
+             */
+            char *tim_name = tf_tile_set->source;
+            STR_TO_LOWERCASE(tim_name);
+
+            char substr[16];
+            STR_READ_UNTIL(tim_name, substr, '.');
+
+            if (STR_CONTAINS(curr_ts->source, substr)) {
+                // Match found, give firstgid to tf object
+                tf_tile_set->start_id = curr_ts->firstgid;
+            }
+        }
+    }
 }
 
 RECT get_rect(short x, short y, short w, short h) {
