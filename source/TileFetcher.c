@@ -6,15 +6,8 @@
 #include "../header/StrUtils.h"
 #include "../header/Logger.h"
 
-SpriteLayer *init_sprite_layer() {
-    SpriteLayer *sl = MEM_MALLOC_3(SpriteLayer);
-    sl->sprites = NULL;
-    sl->next = NULL;
-    sl->sprites_cnt = 0;
-    sl->prio = 0;
-    return sl;
-}
-
+SpriteLayer *init_sprite_layer();
+SpriteLayer *init_sprite_layer();
 u_short to_tm_u_coord(u_short id, u_short cols, u_short tile_w);
 u_short to_tm_v_coord(u_short id, u_short rows, u_short tile_h);
 GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
@@ -135,4 +128,13 @@ u_short to_tm_v_coord(u_short id, u_short rows, u_short tile_h) {
         id -= rows;
     }
     return v * tile_h;
+}
+
+SpriteLayer *init_sprite_layer() {
+    SpriteLayer *sl = MEM_MALLOC_3(SpriteLayer);
+    sl->sprites = NULL;
+    sl->next = NULL;
+    sl->sprites_cnt = 0;
+    sl->prio = 0;
+    return sl;
 }
