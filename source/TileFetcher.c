@@ -7,7 +7,6 @@
 #include "../header/Logger.h"
 
 SpriteLayer *init_sprite_layer();
-SpriteLayer *init_sprite_layer();
 u_short to_tm_u_coord(u_short id, u_short cols, u_short tile_w);
 u_short to_tm_v_coord(u_short id, u_short rows, u_short tile_h);
 GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
@@ -46,12 +45,13 @@ void tf_add_layers_to_frame(Frame *frame, TF_TileSet **tile_sets, u_char n_tiles
             if (id == 0) {
                 logr_log(TRACE, "TileFetcher.c", "tl_get_layers", "skipping null tile at index=%d", tiles_cnt);
             } else {
-                u_short x = curr_col * map->tile_width;
-                u_short y = rows_cnt * map->tile_height;
+                GsSPRITE *sprite;
+                u_short x = frame->offset_x + (curr_col * map->tile_width);
+                u_short y = frame->offset_y + (rows_cnt * map->tile_height);
 
                 --id;   // because they are 1 indexed in exported json, but tileset is 0 indexed
 
-                GsSPRITE *sprite = map_tile(id, x, y, tile_sets, n_tilesets, map);
+                sprite = map_tile(id, x, y, tile_sets, n_tilesets, map);
                 if (sprite == NULL) {
                     logr_log(ERROR, "TileFetcher.c", "tl_get_layers", "Id of col=%d at layer=%s exceeds max dimensions for tilesets, terminating...", id, tl_curr->layer_type);
                     exit(1);
@@ -90,10 +90,9 @@ GsSPRITE *map_tile(u_short id, u_short x, u_short y, TF_TileSet **tile_sets, u_c
     for(i = 0; i < n_tilesets; i++) {
         TF_TileSet *tf_tileset = tile_sets[i];
         GsSPRITE *base = tf_tileset->sprite;
-        base->w = base->h = 256; // Just for hacksx
 
-        u_short ts_tw = base->w / map->tile_width;
-        u_short ts_th = base->h / map->tile_height;
+        u_short ts_tw = map->tile_width;
+        u_short ts_th = map->tile_height;
 
         u_short ts_start_id = tf_tileset->start_id - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
 
@@ -137,4 +136,12 @@ SpriteLayer *init_sprite_layer() {
     sl->sprites_cnt = 0;
     sl->prio = 0;
     return sl;
+}
+
+TF_TileSet *tf_malloc_tf_tileset() {
+    TF_TileSet *ts = MEM_MALLOC_3(TF_TileSet);
+    ts->source = NULL;
+    ts->sprite = NULL;
+    ts->start_id = 0;
+    return ts;
 }
