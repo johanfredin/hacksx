@@ -1,14 +1,11 @@
 #include <stdio.h>
 
 #include "../header/AssetManager.h"
-#include "../header/CdReader.h"
 #include "../header/GPUBase.h"
 #include "../header/GameObject.h"
-#include "../header/Logger.h"
 #include "../header/Map.h"
 #include "../header/MemUtils.h"
 #include "../header/TileFetcher.h"
-#include "../header/Tiled.h"
 
 #include <LIBETC.H>
 #include <StrUtils.h>
@@ -16,7 +13,7 @@
 #define MAP_START_FRAME 0
 
 Frame *map_frames;
-TF_TileSet **map_tile_sets;
+FR_TileSet **map_tile_sets;
 CdrData **map_cdr_data_assets;
 
 u_char assets_cnt = 0, tilesets_count = 0;
@@ -25,11 +22,10 @@ u_char current_frame = MAP_START_FRAME;
 
 void init_frame(Frame *frame, char *gobj, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
-TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
 void load_level_assets_from_cd(u_char level);
-void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets);
+void transfer_to_frame_tileset(Tile_Set *tile_sets);
 void load_tilesets();
 
 void map_init(u_char level) {
@@ -38,10 +34,6 @@ void map_init(u_char level) {
     load_tilesets();
 
     map_frames = MEM_CALLOC_3(8, Frame);
-    init_frame(&map_frames[frame_cnt++], NULL, "TS8_TL.JSON");
-    init_frame(&map_frames[frame_cnt++], NULL, "TS8_BL.JSON");
-    init_frame(&map_frames[frame_cnt++], NULL, "TS8_TR.JSON");
-    init_frame(&map_frames[frame_cnt++], NULL, "TS8_BR.JSON");
     init_frame(&map_frames[frame_cnt++], NULL, "TS8_IN1.JSON");
 
     // Cleanup
@@ -67,10 +59,6 @@ void load_level_assets_from_cd(u_char level) {
 
         // Load tile maps
         assets_cnt += tilesets_count;
-        map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_TL.JSON");
-        map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_BL.JSON");
-        map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_TR.JSON");
-        map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_BR.JSON");
         map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_IN1.JSON");
     }
     cdr_close();
@@ -79,7 +67,7 @@ void load_level_assets_from_cd(u_char level) {
 
 void load_tilesets() {
     u_char i;
-    map_tile_sets = MEM_CALLOC_3_PTRS(tilesets_count, TF_TileSet);
+    map_tile_sets = MEM_CALLOC_3_PTRS(tilesets_count, FR_TileSet);
     for (i = 0; i < tilesets_count; i++) {
         map_tile_sets[i] = tf_malloc_tf_tileset();
         map_tile_sets[i]->sprite = asmg_load_sprite(map_cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);
@@ -112,7 +100,7 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     json_map_data = jsonp_parse((char *)content);
     tile_map = tiled_populate_from_json(json_map_data);
     tiled_print_map(DEBUG, tile_map);
-    transfer_firstgid_to_tf_tilesets(tile_map->tile_sets);
+    transfer_to_frame_tileset(tile_map->tile_sets);
 
     // Calc potential x and/or y offsets (e.g frame is smaller than screen w and/or h)
     map_w = tile_map->width * tile_map->tile_width;
@@ -141,9 +129,6 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
         u_short y = curr_b->y + frame->offset_y;
 
         collision_blocks->bounds[i] = get_rect(x, y, curr_b->width, curr_b->height);
-        if (GPUB_DRAW_BOUNDS) {
-            collision_blocks->cb_bound_lines[i] = get_tile(x, y, curr_b->width, curr_b->height, 255, 0, 0);
-        }
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
@@ -161,9 +146,6 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
         teleports[i].dest_y = curr_t->dest_y;
         teleports[i].dest_frame = curr_t->dest_frame;
 
-        if (GPUB_DRAW_BOUNDS) {
-            teleports[i].t_bound_lines = get_tile(x, y, curr_t->width, curr_t->height, 0, 0, 255);
-        }
         logr_log(DEBUG, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
     }
     frame->t_amount = teleports_cnt;
@@ -174,7 +156,7 @@ void init_frame(Frame *frame, char *gobj, char *json_map_file) {
     tiled_free(tile_map);
 }
 
-void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets) {
+void transfer_to_frame_tileset(Tile_Set *tile_sets) {
     Tile_Set *curr_ts;
 
     // Iterate tilesets that the tile map is using
@@ -184,9 +166,9 @@ void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets) {
 
         // Iterate our tf_tilesets to look for a matching image
         for(i = 0; i < tilesets_count; i++) {
-            u_char count = 0;
+            u_char count;
             char substr[16];
-            TF_TileSet *tf_tile_set = map_tile_sets[i];
+            FR_TileSet *tf_tile_set = map_tile_sets[i];
             /*
              * Compare source in current map tileset with the one for the image
              * We do this by making a lower case comparison and checking if the
@@ -200,6 +182,7 @@ void transfer_firstgid_to_tf_tilesets(Tile_Set *tile_sets) {
             if (STR_CONTAINS(curr_ts->source, substr)) {
                 // Match found, give firstgid to tf object
                 tf_tile_set->start_id = curr_ts->firstgid;
+                tf_tile_set->source = curr_ts->source;
             }
         }
     }
@@ -209,18 +192,6 @@ RECT get_rect(short x, short y, short w, short h) {
     RECT r = {x, y, w, h};
     logr_log(TRACE, "Map.c", "get_rect", "Coords assigned at {x:%d, y%d, w:%d, h:%d}", r.x, r.y, r.w, r.h);
     return r;
-}
-
-TILE get_tile(short x, short y, short w, short h, u_short r, u_short g, u_short b) {
-    TILE bounds;
-    SetTile(&bounds);
-    bounds.x0 = x;
-    bounds.y0 = y;
-    bounds.w = w;
-    bounds.h = h;
-    setRGB0(&bounds, r, g, b);
-    logr_log(TRACE, "Map.c", "get_tile", "TILE bounds={x:%d, y:%d, w:%d, h:%d}", bounds.x0, bounds.y0, bounds.w, bounds.h);
-    return bounds;
 }
 
 void map_draw(Player *player) {
@@ -252,24 +223,11 @@ void map_draw(Player *player) {
 
     if (GPUB_PRINT_COORDS) {
         CollisionBlock *blocks = frame->collision_blocks;
-        FntPrint("Current framee=%d\n", current_frame);
+        FntPrint("Current frame=%d\n", current_frame);
         FntPrint("Blocks in frame=%d\n", blocks->amount);
         FntPrint("Teleports in frame=%d\n", frame->t_amount);
     }
 
-    if (GPUB_DRAW_BOUNDS) {
-        CollisionBlock *blocks = frame->collision_blocks;
-        Teleport *teleports = frame->teleports;
-        int blockIdx = 0, t_idx = 0;
-        while (blockIdx < blocks->amount) {
-            DrawPrim(&blocks->cb_bound_lines[blockIdx]);
-            blockIdx++;
-        }
-        while (t_idx < frame->t_amount) {
-            DrawPrim(&teleports[t_idx].t_bound_lines);
-            t_idx++;
-        }
-    }
 }
 
 void map_tick(Player *player) {

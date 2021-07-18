@@ -9,9 +9,6 @@
  */
 #define MAP_MALLOC_COLLISION_BLOCK(cb, bounds_cnt)           \
     cb = MEM_MALLOC_3(CollisionBlock);                       \
-    if (GPUB_DRAW_BOUNDS) {                                  \
-        cb->cb_bound_lines = MEM_CALLOC_3(bounds_cnt, TILE); \
-    }                                                        \
     cb->bounds = MEM_CALLOC_3(bounds_cnt, RECT)
 
 

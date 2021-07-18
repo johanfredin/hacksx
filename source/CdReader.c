@@ -28,7 +28,7 @@ CdrData *cdr_create_data_entry(char *name) {
 CdrData *cdr_find_data_entry(char* name, CdrData **assets, unsigned char assets_cnt) {
     int i;
     for(i = 0; i < assets_cnt; i++) {
-        if(STREQ(assets[i]->name, name)) {
+        if(STR_EQ(assets[i]->name, name)) {
             logr_log(TRACE, "CdReader.c", "cdr_find_data_entry" "Name=%s, found at index=%d", assets[i]->name, i);
             return assets[i];
         }

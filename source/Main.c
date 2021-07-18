@@ -20,7 +20,8 @@ int main() {
 
     // 2. Substr until first .
     char substr[16];
-    STR_READ_UNTIL(tim, substr, '.');
+    int count = 0;
+    STR_READ_UNTIL(tim, substr, '.', count);
     printf("tim now=%s\n", substr);
 
     // 3. Look for a match in source

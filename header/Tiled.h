@@ -13,11 +13,11 @@
  * @param val value to check
  */
 #define TILED_VALIDATE_PROP(key, val)                                                                                               \
-    if (!(STREQ(key, "name"))) {                                                                                                    \
+    if (STR_NEQ(key, "name")) {                                                                                                     \
         logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='name' expected here, instead was=%s, exiting...", key);    \
         exit(1);                                                                                                                    \
     }                                                                                                                               \
-    if (!(STREQ(val, "value"))) {                                                                                                   \
+    if (STR_NEQ(val, "value")) {                                                                                                    \
         logr_log(ERROR, "Tiled.h", "TILED_VALIDATE_PROP", "property key='value' expected here, instead was='%s', exiting...", val); \
         exit(1);                                                                                                                    \
     }
@@ -64,9 +64,7 @@ typedef struct Tile_Map {
     Tile_Layer *layers;
     ObjectLayer_Bounds *bounds;
     ObjectLayer_Teleport *teleports;
-    u_char bounds_cnt, layers_cnt;
-    u_char teleports_cnt;
-    u_short offset_x, offset_y;
+    u_char bounds_cnt, layers_cnt, teleports_cnt, tilesets_cnt;
     Tile_Set *tile_sets;
 } Tile_Map;
 

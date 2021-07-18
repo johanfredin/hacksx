@@ -187,7 +187,7 @@ void get_number(JSON_Data *entry) {
 void get_bool(JSON_Data *entry) {
     char *str_bool = read_until('e', 1); // true and false both end at 'e'
     u_char *bool_ptr = MEM_MALLOC_3(u_char);
-    *bool_ptr = STREQ(str_bool, "true");
+    *bool_ptr = STR_EQ(str_bool, "true");
     MEM_FREE_3_AND_NULL(str_bool);
     str_bool = NULL;
     entry->value = bool_ptr;

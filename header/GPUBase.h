@@ -28,7 +28,6 @@
 
 #define GPUB_IS_FNT_BG 0
 
-#define GPUB_DRAW_BOUNDS 0           // Set to 1 to draw map bounds as red rectangles
 #define GPUB_PRINT_COORDS 1          // Set to 1 to FntPrint player coordinates to screen
 
 

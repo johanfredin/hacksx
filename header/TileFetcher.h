@@ -9,14 +9,8 @@
 #include "Frames.h"
 #include "Tiled.h"
 
-typedef struct TF_TileSet {
-    char *source;
-    GsSPRITE *sprite;
-    u_short start_id;
-} TF_TileSet;
+FR_TileSet *tf_malloc_tf_tileset();
 
-TF_TileSet *tf_malloc_tf_tileset();
-
-void tf_add_layers_to_frame(Frame *frame, struct TF_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
+void tf_add_layers_to_frame(Frame *frame, struct FR_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
 
 #endif //PSX_TILEFETCHER_H
