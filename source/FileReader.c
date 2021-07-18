@@ -1,32 +1,17 @@
-//
-// Created by lowrider on 2021-03-30.
-//
-
 #include <stdint.h>
 #include <stdlib.h>
 
 #include <Logger.h>
 #include <StrUtils.h>
-#include <linux/limits.h>
+#include <unistd.h>
 #include "../header/FileReader.h"
 
-FILE *fr_get_file(const char *fileName) {
-    char *abs_path = realpath(fileName, (char *) PATH_MAX);
-    FILE *file;
-    file = fopen(abs_path, "r");
-    if (file == NULL) {
-        printf("File='%s' not found!", fileName);
-        exit(1);
-    }
-    return file;
-}
-
-char *fr_get_content(const char* fileName) {
-    char *abs_path = realpath(fileName, (char *) PATH_MAX);
-    abs_path = strcat(abs_path, "\\..\\res\\");
+char *fr_get_content(char* fileName) {
+    char buff[FILENAME_MAX];
+    char *abs_path = getcwd(buff, sizeof(buff));
+    abs_path = strcat(abs_path, "/../res/");
     abs_path = strcat(abs_path, fileName);
-    FILE *file;
-    file = fopen(abs_path, "r");
+    FILE *file = fopen(abs_path, "r");
     if (file == NULL) {
         printf("File='%s' not found!", fileName);
         exit(1);

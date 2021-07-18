@@ -7,7 +7,7 @@
 
 #include <stdio.h>
 
-FILE *fr_get_file(const char *fileName);
-char *fr_get_content(const char *fileName);
+FILE *fr_get_file(char *fileName);
+char *fr_get_content(char *fileName);
 
 #endif //BADJSON_FILEREADER_H

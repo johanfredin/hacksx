@@ -185,7 +185,7 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
              * We do this by making a lower case comparison and checking if the
              * full source path in our tiled json file contains the current image name (minus the .tim suffix)
              */
-            char *tim_name = map_fr_tile_set->source;
+            char *tim_name = strdup(map_fr_tile_set->source);
             STR_TO_LOWERCASE(tim_name);
 
             STR_READ_UNTIL(tim_name, substr, '.', count);

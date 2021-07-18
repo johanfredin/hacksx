@@ -11,7 +11,7 @@ int main() {
 //    map_draw(NULL);
 
     char *source = "..\\/..\\/tilesets\\/ts8_tl.tsx";
-    char *tim = "TS8_TL.TIM";
+    char tim[16] = "TS8_TL.TIM";
 
     // 1. To lower
     STR_TO_LOWERCASE(tim);
