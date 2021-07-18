@@ -15,7 +15,7 @@
 #define MEM_CALLOC_3(n, t) (t *)calloc((size_t)n, sizeof(t))
 #define MEM_FREE_3_AND_NULL(ptr) \
     if (ptr != NULL)             \
-        free(ptr);              \
+        free(ptr);               \
     ptr = NULL
 
 #define MEM_FREE_LINKED_LIST(linked_list_root, T)  \

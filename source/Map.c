@@ -12,13 +12,13 @@
 
 #define MAP_START_FRAME 0
 
-Frame *map_frames;
-FR_TileSet **map_tile_sets;
-CdrData **map_cdr_data_assets;
+Frame *g_map_frames;
+FR_TileSet **g_map_tile_sets;
+CdrData **g_map_cdr_data_assets;
 
-u_char assets_cnt = 0, map_tilesets_count = 0;
-u_char frame_cnt;
-u_char current_frame = MAP_START_FRAME;
+u_char g_assets_cnt = 0, g_map_tilesets_count = 0;
+u_char g_frame_cnt;
+u_char g_current_frame = MAP_START_FRAME;
 
 void init_frame(Frame *frame, char *json_map_file);
 RECT get_rect(short x, short y, short w, short h);
@@ -42,14 +42,14 @@ void map_init(u_char level) {
     load_level_assets_from_cd(level);
     load_tilesets();
 
-    map_frames = MEM_CALLOC_3(8, Frame);
-    init_frame(&map_frames[frame_cnt++], "TS8_IN1.JSON");
+    g_map_frames = MEM_CALLOC_3(8, Frame);
+    init_frame(&g_map_frames[g_frame_cnt++], "TS8_IN1.JSON");
 
     // Cleanup
-    for (i = 0; i < assets_cnt; i++) {
-        cdr_data_free(map_cdr_data_assets[i]);
+    for (i = 0; i < g_assets_cnt; i++) {
+        cdr_data_free(g_map_cdr_data_assets[i]);
     }
-    MEM_FREE_3_AND_NULL(map_cdr_data_assets);
+    MEM_FREE_3_AND_NULL(g_map_cdr_data_assets);
 }
 
 void load_level_assets_from_cd(u_char level) {
@@ -58,32 +58,36 @@ void load_level_assets_from_cd(u_char level) {
     logr_log(INFO, "Map.c", "load_level_assets_from_cd", "*********************************");
     cdr_open();
     if (level == 1) {
-        map_cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
+        g_map_cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
         // Load tile sets
-        map_cdr_data_assets[map_tilesets_count++] = cdr_read_file("TS8_TL.TIM");
-        map_cdr_data_assets[map_tilesets_count++] = cdr_read_file("TS8_TR.TIM");
-        map_cdr_data_assets[map_tilesets_count++] = cdr_read_file("TS8_BL.TIM");
-        map_cdr_data_assets[map_tilesets_count++] = cdr_read_file("TS8_BR.TIM");
-        map_cdr_data_assets[map_tilesets_count++] = cdr_read_file("TS8_IN.TIM");
+        g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_TL.TIM");
+        g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_TR.TIM");
+        g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_BL.TIM");
+        g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_BR.TIM");
+        g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_IN.TIM");
 
         // Load tile maps
-        assets_cnt += map_tilesets_count;
-        map_cdr_data_assets[assets_cnt++] = cdr_read_file("TS8_IN1.JSON");
+        g_assets_cnt += g_map_tilesets_count;
+        g_map_cdr_data_assets[g_assets_cnt++] = cdr_read_file("TS8_IN1.JSON");
     }
     cdr_close();
-    logr_log(DEBUG, "Map.c", "load_level_assets_from_cd", "%d assets loaded", assets_cnt);
+    logr_log(DEBUG, "Map.c", "load_level_assets_from_cd", "%d assets loaded", g_assets_cnt);
 }
 
+/**
+ * Populates our global array of FR_TileSet structs from the tileset CdrData assets.
+ * Retrieve the GS_SPRITE and the asset name.
+ */
 void load_tilesets() {
     u_char i;
-    map_tile_sets = MEM_CALLOC_3_PTRS(map_tilesets_count, FR_TileSet);
-    for (i = 0; i < map_tilesets_count; i++) {
-        map_tile_sets[i] = tf_malloc_tf_tileset();
-        map_tile_sets[i]->sprite = asmg_load_sprite(map_cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);
-        map_tile_sets[i]->source = map_cdr_data_assets[i]->name;
-        logr_log(TRACE, "Map.c", "load_tilesets", "tileset=%s loaded", map_cdr_data_assets[i]->name);
+    g_map_tile_sets = MEM_CALLOC_3_PTRS(g_map_tilesets_count, FR_TileSet);
+    for (i = 0; i < g_map_tilesets_count; i++) {
+        g_map_tile_sets[i] = tf_malloc_tf_tileset();
+        g_map_tile_sets[i]->sprite = asmg_load_sprite(g_map_cdr_data_assets[i], 0, 0, 128, ASMG_COLOR_BITS_8);
+        g_map_tile_sets[i]->source = g_map_cdr_data_assets[i]->name;
+        logr_log(TRACE, "Map.c", "load_tilesets", "tileset=%s loaded", g_map_cdr_data_assets[i]->name);
     }
-    logr_log(DEBUG, "Map.c", "load_tilesets", "%d tilesets loaded", map_tilesets_count);
+    logr_log(DEBUG, "Map.c", "load_tilesets", "%d tilesets loaded", g_map_tilesets_count);
 }
 
 void init_frame(Frame *frame, char *json_map_file) {
@@ -103,7 +107,7 @@ void init_frame(Frame *frame, char *json_map_file) {
     u_char offset_x = 0, offset_y = 0;
 
     // Parse json file into tile map
-    json_cdr_data = cdr_find_data_entry(json_map_file, map_cdr_data_assets, assets_cnt);
+    json_cdr_data = cdr_find_data_entry(json_map_file, g_map_cdr_data_assets, g_assets_cnt);
     logr_log(INFO, "Map.c", "init_frame", "JSON file=%s retrieved", json_map_file);
     content = json_cdr_data->file;
     json_map_data = jsonp_parse((char *)content);
@@ -128,7 +132,7 @@ void init_frame(Frame *frame, char *json_map_file) {
     logr_log(DEBUG, "Map.c", "init_frame", "frame offset_x=%d, offset_y=%d", offset_x, offset_y);
 
     // Load tilesets (frame may consist of multiple tilesets)
-    tf_add_layers_to_frame(frame, frame->fr_tilesets, map_tilesets_count, tile_map);
+    tf_add_layers_to_frame(frame, frame->fr_tilesets, g_map_tilesets_count, tile_map);
 
     // Init collision blocks
     blocks_cnt = tile_map->bounds_cnt;
@@ -175,11 +179,11 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
         u_char i;
 
         // Iterate the map FR_Tileset array to look for a matching image
-        for(i = 0; i < map_tilesets_count; i++) {
+        for(i = 0; i < g_map_tilesets_count; i++) {
             u_char count;
             char *source = curr_ts->source;
             char substr[16];
-            FR_TileSet *map_fr_tile_set = map_tile_sets[i];
+            FR_TileSet *map_fr_tile_set = g_map_tile_sets[i];
             /*
              * Compare source in current map tileset with the one for the image
              * We do this by making a lower case comparison and checking if the
@@ -189,6 +193,7 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
             STR_TO_LOWERCASE(tim_name);
 
             STR_READ_UNTIL(tim_name, substr, '.', count);
+            MEM_FREE_3_AND_NULL(tim_name);
 
             if (STR_CONTAINS(source, substr)) {
                 // Match found, assign it to frame tilesets
@@ -218,7 +223,7 @@ RECT get_rect(short x, short y, short w, short h) {
 
 void map_draw(Player *player) {
     SpriteLayer *curr_sl;
-    Frame *frame = &map_frames[current_frame];
+    Frame *frame = &g_map_frames[g_current_frame];
 
     if (frame->bg_layers != NULL) {
         for (curr_sl = frame->bg_layers; curr_sl != NULL; curr_sl = curr_sl->next) {
@@ -245,7 +250,7 @@ void map_draw(Player *player) {
 
     if (GPUB_PRINT_COORDS) {
         CollisionBlock *blocks = frame->collision_blocks;
-        FntPrint("Current frame=%d\n", current_frame);
+        FntPrint("Current frame=%d\n", g_current_frame);
         FntPrint("Blocks in frame=%d\n", blocks->amount);
         FntPrint("Teleports in frame=%d\n", frame->t_amount);
     }
@@ -253,14 +258,14 @@ void map_draw(Player *player) {
 }
 
 void map_tick(Player *player) {
-    Frame *frame = &map_frames[current_frame];
+    Frame *frame = &g_map_frames[g_current_frame];
     // TEMP
     u_long btn = PadRead(1);
     if (btn & PADselect) {
-        if (current_frame >= 3) {
-            current_frame = 0;
+        if (g_current_frame >= 3) {
+            g_current_frame = 0;
         } else {
-            current_frame++;
+            g_current_frame++;
         }
     }
 
@@ -369,7 +374,7 @@ void handle_teleport_collision(GameObject *gobj, Frame *frame) {
                     if (frame->game_object != NULL && frame->game_object->type == GOBJ_TYPE_NPC) {
                         GOBJ_RESET_POS(frame->game_object);
                     }
-                    current_frame = t.dest_frame;
+                    g_current_frame = t.dest_frame;
                     break;
                 case GOBJ_TYPE_NPC:
                     if (right_col || leftCol) {

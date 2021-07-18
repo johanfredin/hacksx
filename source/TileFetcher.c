@@ -19,7 +19,7 @@ void tf_add_layers_to_frame(Frame *frame, FR_TileSet *tile_sets, u_char n_tilese
 
     logr_log(TRACE, "TileFetcher.c", "tl_get_layers", "Entered function");
 
-    // Iterate all layers
+    // Iterate map tile layers
     for (tl_curr = map->layers; tl_curr != NULL; tl_curr = tl_curr->next) {
         Layer_Data *ld_curr;
         u_short curr_col = 0, tiles_cnt = 0, rows_cnt = 0, active_tiles_cnt = 0;
@@ -85,7 +85,7 @@ void tf_add_layers_to_frame(Frame *frame, FR_TileSet *tile_sets, u_char n_tilese
 
 GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet *tile_sets, u_char n_tilesets, Tile_Map *map) {
     u_char i;
-    GsSPRITE *tile;
+    GsSPRITE *tile_sprite;
 
     // Iterate our fr_tilesets
     for(i = 0; i < n_tilesets; i++) {
@@ -94,7 +94,7 @@ GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet *tile_sets, u_ch
 
         u_short ts_tw = map->tile_width;
         u_short ts_th = map->tile_height;
-        u_short ts_start_id = tf_tileset->start_id;
+        u_short ts_start_id = tf_tileset->start_id - 1; // Same as before, ids are 1 indexed in json but actually 0 indexed in Tiled editor, 0 in json means null and we have already covered that before
         u_short max_id = ts_start_id + (ts_tw * ts_th);
 
         if(id >= ts_start_id && id <= max_id) {
@@ -102,11 +102,11 @@ GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet *tile_sets, u_ch
             u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
             u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
 
-            tile = MEM_MALLOC_3(GsSPRITE);
+            tile_sprite = MEM_MALLOC_3(GsSPRITE);
 
-            asmg_get_region(base, tile, x, y, u, v, map->tile_width, map->tile_height);
-            LOGR_LOG_GS_OBJ(DEBUG, tile);
-            return tile;
+            asmg_get_region(base, tile_sprite, x, y, u, v, map->tile_width, map->tile_height);
+            LOGR_LOG_GS_OBJ(DEBUG, tile_sprite);
+            return tile_sprite;
         }
     }
 

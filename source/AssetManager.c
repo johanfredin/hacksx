@@ -100,10 +100,21 @@ GsSPRITE *asmg_load_sprite_w_offset(CdrData *cdr_data, u_short x, u_short y, u_s
     return asmg_load_sprite(cdr_data, x + offset_x, y + offset_y, blend, num_color_bits);
 }
 
+/**
+ * Crops coords and offsets passed in from base sprite and gives to the region.
+ * @param base
+ * @param region
+ * @param x
+ * @param y
+ * @param u
+ * @param v
+ * @param w
+ * @param h
+ */
 void asmg_get_region(GsSPRITE *base, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h) {
     region->attribute = base->attribute;
-    region->x = x;
-    region->y = y;
+    region->x = (short) x;
+    region->y = (short) y;
     region->w = w;
     region->h = h;
     region->tpage = base->tpage;
@@ -127,8 +138,12 @@ u_char get_tpage_color_bit_mode(u_short num_color_bits) {
             return 1;
         case ASMG_COLOR_BITS_16:
             return 2;
+        default:
+            logr_log(ERROR, "AssetManager.c", "get_tpage_color_bit_mode",
+                     "Unknown num_color_bits value=%d, needs to be one of [%d, %d, %d]. Terminating...",
+                     num_color_bits, ASMG_COLOR_BITS_4, ASMG_COLOR_BITS_8, ASMG_COLOR_BITS_16);
+            exit(1);
     }
-    return -1;
 }
 
 u_char get_width_by_color_bits_mode(u_short num_color_bits) {
@@ -137,8 +152,9 @@ u_char get_width_by_color_bits_mode(u_short num_color_bits) {
             return 2;
         case ASMG_COLOR_BITS_16:
             return 1;
+        default:
+            return num_color_bits;
     }
-    return num_color_bits;
 }
 
 u_long get_attribute_by_color_bits_mode(u_short num_color_bits) {
@@ -149,6 +165,10 @@ u_long get_attribute_by_color_bits_mode(u_short num_color_bits) {
             return 0x1000000;
         case ASMG_COLOR_BITS_16:
             return 0x2000000;
+        default:
+            logr_log(ERROR, "AssetManager.c", "get_attribute_by_color_bits_mode",
+                     "Unknown num_color_bits value=%d, needs to be one of [%d, %d, %d]. Terminating...",
+                     num_color_bits, ASMG_COLOR_BITS_4, ASMG_COLOR_BITS_8, ASMG_COLOR_BITS_16);
+            exit(1);
     }
-    return -1;
 }

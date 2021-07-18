@@ -60,11 +60,22 @@ typedef struct Tile_Layer {
 } Tile_Layer;
 
 typedef struct Tile_Map {
-    u_short width, height, tile_width, tile_height;
+    // Map width in n_tiles (not in pixels)
+    u_short width;
+    // Map height in n_tiles (not in pixels)
+    u_short height;
+    // Map tile width in pixels
+    u_short tile_width;
+    // Map tile height in pixels
+    u_short tile_height;
+    // Pointer to linked list of tile layers
     Tile_Layer *layers;
+    // Pointer to linked list of bounds
     ObjectLayer_Bounds *bounds;
+    // Pointer to linked list of teleports
     ObjectLayer_Teleport *teleports;
     u_char bounds_cnt, layers_cnt, teleports_cnt, tilesets_cnt;
+    // Pointer to linked list of tilesets
     Tile_Set *tile_sets;
 } Tile_Map;
 
