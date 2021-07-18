@@ -343,9 +343,9 @@ void add_tile_sets_to_map(Tile_Map *tm, JSON_Data *root) {
     JSON_Data *json_curr;
     Tile_Set *ts_root = MEM_MALLOC_3(Tile_Set);
     Tile_Set *ts_curr = ts_root;
-    for (json_curr = root; json_curr != NULL; json_curr = json_curr->next) {
+    for (json_curr = root, tilesets_cnt = 0; json_curr != NULL; json_curr = json_curr->next, tilesets_cnt++) {
         JSON_Data *json_tileset;
-        for (json_tileset = (JSON_Data *) json_curr->value, tilesets_cnt = 0; json_tileset != NULL; json_tileset = json_tileset->next, tilesets_cnt++) {
+        for (json_tileset = (JSON_Data *) json_curr->value; json_tileset != NULL; json_tileset = json_tileset->next) {
             if (STR_EQ(json_tileset->key, "firstgid")) {
                 ts_curr->firstgid = *(u_short *) json_tileset->value;
             } else if (STR_EQ(json_tileset->key, "source")) {

@@ -39,10 +39,9 @@ typedef struct Frame {
     CollisionBlock *collision_blocks;
     Teleport *teleports;
     GameObject *game_object;
-    FR_TileSet *tf_tilesets;
+    FR_TileSet *fr_tilesets;
 } Frame;
 
-Frame *frames_malloc();
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
 #endif

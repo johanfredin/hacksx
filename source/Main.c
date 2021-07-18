@@ -1,6 +1,5 @@
 #include <Frames.h>
 #include <Map.h>
-#include <vcruntime_string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <StrUtils.h>

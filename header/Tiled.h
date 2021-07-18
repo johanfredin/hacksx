@@ -81,7 +81,7 @@ void tiled_print_map(u_char level, Tile_Map *map);
 
 /**
  * Frees all the allocated memory in linked list passed in.
- * @param tm tm entry of linked list
+ * @param tm entry of linked list
  */
 void tiled_free(Tile_Map *tm);
 

@@ -1,5 +1,7 @@
-#include <stdlib.h>
 #include "../header/GPUBase.h"
+
+#include <stdint.h>
+#include <stdlib.h>
 
 u_short w, h;
 

@@ -26,14 +26,4 @@ void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer) {
     frames_insert_after(curr, new_layer);
 }
 
-Frame *frames_malloc() {
-    Frame *f = MEM_MALLOC_3(Frame);
-    f->fg_layers = NULL;
-    f->bg_layers = NULL;
-    f->collision_blocks = NULL;
-    f->game_object = NULL;
-    f->offset_x = f->offset_y = f->t_amount = 0;
-    f->teleports = NULL;
-    return f;
-}
 

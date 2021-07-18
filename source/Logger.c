@@ -1,8 +1,10 @@
 #include "../header/Logger.h"
 
-#include <stdarg.h>
+#include <stdint.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <stdio.h>
+
 
 char *get_level(unsigned char level) {
     switch (level) {

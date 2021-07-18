@@ -2,14 +2,16 @@
 // Created by lowrider on 2021-03-30.
 //
 
+#include <stdint.h>
 #include <stdlib.h>
-#include <vcruntime_string.h>
+
 #include <Logger.h>
 #include <StrUtils.h>
+#include <linux/limits.h>
 #include "../header/FileReader.h"
 
 FILE *fr_get_file(const char *fileName) {
-    char *abs_path = _fullpath(NULL, fileName, 512);
+    char *abs_path = realpath(fileName, (char *) PATH_MAX);
     FILE *file;
     file = fopen(abs_path, "r");
     if (file == NULL) {
@@ -20,13 +22,7 @@ FILE *fr_get_file(const char *fileName) {
 }
 
 char *fr_get_content(const char* fileName) {
-//    char *dot = strrchr(fileName, '.');
-//    if(dot && STR_EQ(dot, ".TIM")) {
-//        logr_log(WARN, "FileReader.c", "fr_get_content", "Skipping TIM files in hacksx, file skipped=%s", fileName);
-//        return NULL;
-//    }
-
-    char *abs_path = _fullpath(NULL, NULL, 512);
+    char *abs_path = realpath(fileName, (char *) PATH_MAX);
     abs_path = strcat(abs_path, "\\..\\res\\");
     abs_path = strcat(abs_path, fileName);
     FILE *file;

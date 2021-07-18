@@ -23,7 +23,7 @@
     }                                                                       \
     substr[count] = '\0'
 
-#define STR_CONTAINS(str_to_check, str_val_to_find) strstr(str_to_check, str_val_to_find) != NULL
+#define STR_CONTAINS(str_to_check, str_val_to_find) STR_NEQ(str_to_check, "") && strstr(str_to_check, str_val_to_find) != NULL
 
 #endif //PSX_STR_UTILS_H
 

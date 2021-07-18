@@ -1,5 +1,7 @@
-#include <CTYPE.H>
+#include <stdint.h>
+#include <stdlib.h>
 #include <stdio.h>
+
 #include "../header/TileFetcher.h"
 #include "../header/MemUtils.h"
 #include "../header/AssetManager.h"
@@ -8,9 +10,9 @@
 SpriteLayer *init_sprite_layer();
 u_short to_tm_u_coord(u_short id, u_short cols, u_short tile_w);
 u_short to_tm_v_coord(u_short id, u_short rows, u_short tile_h);
-GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map);
+GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet *tile_sets, u_char n_tilesets, Tile_Map *map);
 
-void tf_add_layers_to_frame(Frame *frame, FR_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map) {
+void tf_add_layers_to_frame(Frame *frame, FR_TileSet *tile_sets, u_char n_tilesets, Tile_Map *map) {
     SpriteLayer *root_bg_layer = NULL;
     SpriteLayer *root_fg_layer = NULL;
     Tile_Layer *tl_curr;
@@ -81,24 +83,21 @@ void tf_add_layers_to_frame(Frame *frame, FR_TileSet **tile_sets, u_char n_tiles
     frame->fg_layers = root_fg_layer;
 }
 
-GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet **tile_sets, u_char n_tilesets, Tile_Map *map) {
+GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet *tile_sets, u_char n_tilesets, Tile_Map *map) {
     u_char i;
     GsSPRITE *tile;
 
-    // Iterate our tf_tilesets
+    // Iterate our fr_tilesets
     for(i = 0; i < n_tilesets; i++) {
-        FR_TileSet *tf_tileset = tile_sets[i];
+        FR_TileSet *tf_tileset = &tile_sets[i];
         GsSPRITE *base = tf_tileset->sprite;
 
         u_short ts_tw = map->tile_width;
         u_short ts_th = map->tile_height;
-
-        u_short ts_start_id = tf_tileset->start_id - 1;   // because they are 1 indexed in exported json, but tileset is 0 indexed (same as id)
-
+        u_short ts_start_id = tf_tileset->start_id;
         u_short max_id = ts_start_id + (ts_tw * ts_th);
 
         if(id >= ts_start_id && id <= max_id) {
-//        if(STR_EQ(tf_tileset->source, ))
             u_short adapted_id = id - ts_start_id;     // We need to subtract the start id from the tileset so it maps correctly within the tileset image
             u_short u = to_tm_u_coord(adapted_id, ts_tw, map->tile_width);
             u_short v = to_tm_v_coord(adapted_id, ts_th, map->tile_height);
@@ -110,6 +109,7 @@ GsSPRITE *map_tile(u_short id, u_short x, u_short y, FR_TileSet **tile_sets, u_c
             return tile;
         }
     }
+
     return NULL; // Return NULL if we have exceeded all tilesets and still not within range
 }
 
