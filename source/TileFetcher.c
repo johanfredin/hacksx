@@ -137,11 +137,3 @@ SpriteLayer *init_sprite_layer() {
     sl->prio = 0;
     return sl;
 }
-
-FR_TileSet *tf_malloc_tf_tileset() {
-    FR_TileSet *ts = MEM_MALLOC_3(FR_TileSet);
-    ts->source = NULL;
-    ts->sprite = NULL;
-    ts->start_id = 0;
-    return ts;
-}

@@ -42,6 +42,8 @@ typedef struct Frame {
     FR_TileSet *fr_tilesets;
 } Frame;
 
+FR_TileSet *tf_malloc_tf_tileset();
+
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
 #endif

@@ -25,5 +25,11 @@
 
 #define STR_CONTAINS(str_to_check, str_val_to_find) STR_NEQ(str_to_check, "") && strstr(str_to_check, str_val_to_find) != NULL
 
+
+#define STR_COPY(str, len)       \
+    SET_STR_LEN(len, str);  \
+    strcpy(MEM_CALLOC_3(len, char), str)
+
+
 #endif //PSX_STR_UTILS_H
 

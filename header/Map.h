@@ -4,8 +4,7 @@
 #include "GameObject.h"
 
 /**
- * Allocates heap for passed in collision block, its bounds
- * and (if debug render mode) the bound line tiles
+ * Allocates heap for passed in collision block
  */
 #define MAP_MALLOC_COLLISION_BLOCK(cb, bounds_cnt)           \
     cb = MEM_MALLOC_3(CollisionBlock);                       \

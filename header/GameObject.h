@@ -56,7 +56,7 @@ typedef struct {
  * Create a new animation object on the heap with given properties
  * @param curr_u the starting texture frame x offset of the sprite we will work with
  * @param curr_v the starting texture frame y offset of the sprite we will work with
- * @param key_frames the amount of _map_frames on the x axis of the spritesheet passed in. Eg. if sprite w=96 and keyFrames=3 then animation object will assume gameobject sprite has a width of 32 pixels and update annimation in that fassion.
+ * @param key_frames the amount of map_frames on the x axis of the spritesheet passed in. Eg. if sprite w=96 and keyFrames=3 then animation object will assume gameobject sprite has a width of 32 pixels and update annimation in that fassion.
  * @param ticks_per_frame how many rendering iterations until its time to update frame.
  * @return pointer to a new animation object on the heap with given properties
  */

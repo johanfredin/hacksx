@@ -180,7 +180,7 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
 
         // Iterate the map FR_Tileset array to look for a matching image
         for(i = 0; i < g_map_tilesets_count; i++) {
-            u_char count;
+            u_char count, s_len = 0;
             char *source = curr_ts->source;
             char substr[16];
             FR_TileSet *map_fr_tile_set = g_map_tile_sets[i];
@@ -189,7 +189,9 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
              * We do this by making a lower case comparison and checking if the
              * full source path in our tiled json file contains the current image name (minus the .tim suffix)
              */
-            char *tim_name = strdup(map_fr_tile_set->source);
+//            char *tim_name = map_fr_tile_set->source;
+            char *tim_name = strcpy(malloc(strlen(map_fr_tile_set->source)+1),map_fr_tile_set->source);
+            STR_COPY(tim_name, s_len);
             STR_TO_LOWERCASE(tim_name);
 
             STR_READ_UNTIL(tim_name, substr, '.', count);
