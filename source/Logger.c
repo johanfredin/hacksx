@@ -40,8 +40,17 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
                 case 's':
                     printf("%s", va_arg(args, char *));
                     break;
+                case 'c':
+                    printf("%c", va_arg(args, int));
+                    break;
                 case 'd':
                     printf("%d", va_arg(args, int));
+                    break;
+                case 'f':
+                    printf("%f", va_arg(args, double));
+                    break;
+                case 'l':
+                    printf("%lu", va_arg(args, unsigned long));
                     break;
             }
             msg++;

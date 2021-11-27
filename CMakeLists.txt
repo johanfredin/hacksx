@@ -20,6 +20,7 @@ add_executable(hacksx
         header/AssetManager.h
         header/TileFetcher.h
         header/Frames.h
+        header/Font.h
         header/LinkedListTutorial.h
 
         # Mocked psyq header files
@@ -43,6 +44,7 @@ add_executable(hacksx
         source/AssetManager.c
         source/Logger.c
         source/TileFetcher.c
+        source/Font.c
 
         # Mocked psyq definitions
-        psyq/MockPSXTypes.c psyq/LIBDS.h)
+        psyq/MockPSXTypes.c psyq/LIBDS.h header/Timer.h source/Timer.c)

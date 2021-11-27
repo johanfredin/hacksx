@@ -1,13 +1,11 @@
-#include <Map.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <StrUtils.h>
-#include "../header/GPUBase.h"
+#include <Font.h>
+
+#include "../header/Timer.h"
 
 int main() {
-    gpub_init_screen(320, 240, GPUB_MODE_NTSC);
-    map_init(1);
-//    map_draw(NULL);
-
-    return 0;
+    Font *fnt;
+    fnt = font_load("FONT.TIM");
+    clock_t start = clock();
+    font_draw(fnt, "Hej mamma ~", 10, 10);
+    timer_log_time_taken(start);
 }
