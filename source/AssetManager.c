@@ -1,7 +1,9 @@
+#include <LIBSPU.H>
+
 #include "../header/AssetManager.h"
 #include "../header/GPUBase.h"
-#include "../header/MemUtils.h"
 #include "../header/Logger.h"
+#include "../header/MemUtils.h"
 
 u_char get_tpage_color_bit_mode(u_short num_color_bits);
 u_char get_width_by_color_bits_mode(u_short num_color_bits);

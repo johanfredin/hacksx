@@ -1,5 +1,5 @@
-#include <MemUtils.h>
-#include "Frames.h"
+#include "../header/Frames.h"
+#include "../header/MemUtils.h"
 
 void frames_insert_beginning(SpriteLayer **root, SpriteLayer *new_layer) {
     new_layer->next = *root;
@@ -12,12 +12,12 @@ void frames_insert_after(SpriteLayer *layer, SpriteLayer *new_layer) {
 }
 
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer) {
+    SpriteLayer *curr;
     if (*root == NULL || (*root)->prio >= new_layer->prio) {
         frames_insert_beginning(root, new_layer);
         return;
     }
 
-    SpriteLayer *curr;
     for (curr = *root; curr->next != NULL; curr = curr->next) {
         if (curr->next->prio >= new_layer->prio) {
             break;
@@ -26,11 +26,10 @@ void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer) {
     frames_insert_after(curr, new_layer);
 }
 
-FR_TileSet *tf_malloc_tf_tileset() {
+FR_TileSet *frames_malloc_fr_tileset() {
     FR_TileSet *ts = MEM_MALLOC_3(FR_TileSet);
     ts->source = NULL;
     ts->sprite = NULL;
     ts->start_id = 0;
     return ts;
 }
-

@@ -11,12 +11,15 @@
 typedef struct Teleport {
     RECT origin;
     u_short dest_x, dest_y;
-    u_char dest_frame;  // frame array index of frame to change to when colliding with this teleport
+    // frame array index of frame to change to when colliding with this teleport
+    u_char dest_frame;
 } Teleport;
 
 typedef struct CollisionBlock {
-    RECT *bounds;         // The actual physical bounds that we will collide with in the frame
-    u_char amount;        // The amount of blocks on one frame
+    // The actual physical bounds that we will collide with in the frame
+    RECT *bounds;
+    // The amount of blocks on one frame
+    u_char amount;
 } CollisionBlock;
 
 typedef struct SpriteLayer {
@@ -42,8 +45,7 @@ typedef struct Frame {
     FR_TileSet *fr_tilesets;
 } Frame;
 
-FR_TileSet *tf_malloc_tf_tileset();
-
+FR_TileSet *frames_malloc_fr_tileset();
 void frames_insert_sl_sorted(SpriteLayer **root, SpriteLayer *new_layer);
 
 #endif

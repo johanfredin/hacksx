@@ -10,7 +10,6 @@
     cb = MEM_MALLOC_3(CollisionBlock);                       \
     cb->bounds = MEM_CALLOC_3(bounds_cnt, RECT)
 
-
 void map_init(u_char level);
 void map_tick(Player *player);
 void map_draw(Player *player);

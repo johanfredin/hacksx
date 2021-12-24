@@ -9,15 +9,15 @@
 char *get_level(unsigned char level) {
     switch (level) {
         case WARN:
-            return "WRN";
+            return "WARN";
         case ERROR:
-            return "ERR";
+            return "ERROR";
         case INFO:
-            return "INF";
+            return "INFO";
         case DEBUG:
-            return "DBG";
+            return "DEBUG";
         case TRACE:
-            return "TRC";
+            return "TRACE";
         default:
             logr_log(ERROR, "Logger.c", "get_level", "Unknown log level=%d, shutting down...", level);
             exit(1);
@@ -28,7 +28,7 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
     va_list args;
     if (LOG_LEVEL >= level) {
         printf("%s - %s - %s - ", get_level(level), src_file, src_func);
-                va_start(args, msg);
+        va_start(args, msg);
         while (*msg != '\0') {
             if (*msg != '%') {
                 putchar(*msg);
@@ -40,17 +40,15 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
                 case 's':
                     printf("%s", va_arg(args, char *));
                     break;
-                case 'c':
-                    printf("%c", va_arg(args, int));
-                    break;
                 case 'd':
                     printf("%d", va_arg(args, int));
                     break;
-                case 'f':
-                    printf("%f", va_arg(args, double));
+                case 'X':
+                case 'x':
+                    printf("%X", va_arg(args, int));
                     break;
-                case 'l':
-                    printf("%lu", va_arg(args, unsigned long));
+                case 'c':
+                    printf("%c", va_arg(args, int));
                     break;
             }
             msg++;

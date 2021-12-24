@@ -1,7 +1,3 @@
-//
-// Created by lowrider on 2021-03-30.
-//
-
 #ifndef BADJSON_FILEREADER_H
 #define BADJSON_FILEREADER_H
 

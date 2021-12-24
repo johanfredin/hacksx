@@ -1,7 +1,3 @@
-#include <stdint.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "../header/TileFetcher.h"
 #include "../header/MemUtils.h"
 #include "../header/AssetManager.h"

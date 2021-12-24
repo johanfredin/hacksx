@@ -1,42 +1,43 @@
 #include "../header/GPUBase.h"
 
-#include <stdint.h>
-#include <stdlib.h>
+GsOT orderingTable[GPUB_NUM_BUFFERS];
 
+int currentBuffer = 0;
+
+Color bg_color;
+
+u_short gpub_gs_prio;
 u_short w, h;
+u_char gpub_fps;
 
-void gpub_init_screen(u_short screen_w, u_short screen_h, u_char region_mode) {
+void gpub_init_screen(u_short screen_w, u_short screen_h, u_char region_mode, u_char fps) {
     w = screen_w;
     h = screen_h;
-   // Mock
-}
-
-void gpub_display() {
-    // Mock
 }
 
 void gpub_clear_display() {
     // Mock
 }
 
+void gpub_display() {
+    // Mock
+}
+
+void gpub_set_bg_color(Color *color) {
+    bg_color.r = color->r;
+    bg_color.g = color->g;
+    bg_color.b = color->b;
+}
+
+// @return pointer to ordering table at current buffer
+GsOT *gpub_curr_ot() {
+    return &orderingTable[currentBuffer];
+}
+
 u_short gpub_screen_w() {
-    if (w == 0) {
-        logr_log(ERROR, "GPUBase.c", "gpub_screen_w", "width is 0. Make sure to call gpub_init_screen with the width and height you want.");
-        exit(1);
-    }
     return w;
 }
 
 u_short gpub_screen_h() {
-    if (h == 0) {
-        logr_log(ERROR, "GPUBase.c", "gpub_screen_h", "height is 0. Make sure to call gpub_init_screen with the width and height you want.");
-        exit(1);
-    }
     return h;
-}
-
-// GsGetActiveBuff() should have been called prior to calling this function
-// @return pointer to ordering table at current buffer
-GsOT* gpub_curr_ot() {
-    return NULL;
 }
