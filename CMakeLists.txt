@@ -23,6 +23,7 @@ add_executable(hacksx
         header/TxtHandler.h
         header/LinkedListTutorial.h
         header/SoundEffect.h
+        header/TextBox.h
 
         # Mocked psyq header files
         psyq/SYS/TYPES.h
@@ -52,5 +53,5 @@ add_executable(hacksx
         source/Logger.c
         source/TxtHandler.c
         source/TileFetcher.c
-
+        source/TextBox.c
         )

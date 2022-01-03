@@ -4,6 +4,7 @@
 #define FNT_PRINT_ANIM 0     // Set to 1 to FntPrint player animation to screen
 #define FNT_PRINT_COORDS 0   // Set to 1 to FntPrint game object positions to screen
 #define FNT_IS_FONT_BG 0     // Set to 1 to get FntPrint inside a black box
+#define FNT_IS_PRINT_DLG 0   // Set to 1 to FntPrint dialog positions to screen
 
 #define FNT_PRINT_ANIMATION()                                                                                                   \
 if (FNT_PRINT_ANIM) {                                                                                                           \
@@ -21,6 +22,11 @@ if (FNT_PRINT_COORDS) {                                                         
     FntPrint("Current frame=%d\n", curr_frame_n);                               \
     FntPrint("Blocks in frame=%d\n", frame_ptr->collision_blocks->amount);      \
     FntPrint("Teleports in frame=%d\n", frame->t_amount);                       \
+}
+
+#define FNT_PRINT_BOX(box) \
+if (FNT_IS_PRINT_DLG) {                                                                                                                 \
+    FntPrint("box x=%d, y=%d, w=%d, h=%d, tw=%d, th=%d\n", (box)->x, (box)->y, (box)->w, (box)->h, (box)->target_w, (box)->target_h);   \
 }
 
 #endif //PSX_DEV_FNTLOGGER_H

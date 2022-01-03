@@ -8,6 +8,8 @@
 
 char *get_level(unsigned char level) {
     switch (level) {
+        case OFF:
+            return "OFF";
         case WARN:
             return "WARN";
         case ERROR:
@@ -22,6 +24,10 @@ char *get_level(unsigned char level) {
             logr_log(ERROR, "Logger.c", "get_level", "Unknown log level=%d, shutting down...", level);
             exit(1);
     }
+}
+
+void logr_log_tmp(char *msg, ...) {
+    logr_log(OFF, "Logger.c", "TMP", msg);
 }
 
 void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ...) {

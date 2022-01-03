@@ -33,6 +33,10 @@ extern int LoadImage(RECT *rect, u_long *p) {
     return 1;
 }
 
+extern void SetPolyG4(POLY_G4 *p) {
+    // mock
+}
+
 extern void SetTile(TILE *p) {
     // mock
 }

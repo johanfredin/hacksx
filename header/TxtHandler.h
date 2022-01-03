@@ -7,10 +7,8 @@
 
 #include "../header/AssetManager.h"
 
-#define TXT_DLG_CYCLE_COMPLETE(dlg) (dlg)->acc_ticks >= (dlg)->ticks_per_frame
 #define TXT_MSG_CHARS_ACQUIRED(msg) (msg)->acc_chars >= (msg)->strlen
-#define TXT_IS_STATIC_DIALOG(dlg) (dlg)->ticks_per_frame == 0
-#define TXT_MAKE_STATIC_MSG(msg) (msg)->acc_chars = (msg)->strlen
+#define TXT_DLG_LAST_MSG_READ(dlg) (dlg)->messages[dlg->n_messages - 1].active == 0
 
 typedef struct Font {
     // The sprite representing the whole font image
@@ -27,16 +25,18 @@ typedef struct Message {
     GsSPRITE *fnt_sprites;
     u_short strlen;
     u_short acc_chars;
-    u_char active;
+    u_char active: 4;
+    u_char acc_ticks: 4;
 } Message;
 
 typedef struct Dialog {
     Message *messages;
+    char *id;
     u_char n_messages;
     u_char x;
     u_char y;
-    u_char ticks_per_frame: 4;
-    u_char acc_ticks: 4;
+    u_char ticks_per_frame: 7;
+    u_char visible: 1;
 } Dialog;
 
 /**
@@ -49,13 +49,14 @@ typedef struct Dialog {
  */
 Font *txt_fnt_init(char *name, u_char cw, u_char ch, u_char padding);
 
-Dialog *txt_dlg_init(char **strs, u_char n_strs, Font *fnt, u_short ticks_per_frame, u_char x, u_char y);
+Dialog *txt_dlg_init(char **strs, char *id, u_char n_messages, Font *fnt, u_short ticks_per_frame, u_char x, u_char y, u_char visible);
 
-//Message *txt_animated_msg_init(Message *msg, u_short ticks_per_frame);
-Message *txt_msg_init(Font *font, u_char x, u_char y, char *str, u_char make_static);
+Message *txt_msg_init(Font *font, u_char x, u_char y, char *str, u_char make_static, u_char active);
 
 void txt_msg_draw(Message *msg);
 void txt_dlg_draw(Dialog *dlg);
 void txt_dlg_tick(Dialog *dlg);
+void txt_next_msg(Dialog *dlg, u_char can_skip);
+u_char txt_dlg_complete(Dialog *dlg);
 
 #endif //PSX_DEV_TXTHANDLER_H

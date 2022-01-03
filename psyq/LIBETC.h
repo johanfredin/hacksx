@@ -6,6 +6,7 @@
 #define PADLright   2
 #define PADLleft    3
 #define PADselect   4
+#define PADstart    5
 
 unsigned long PadRead(u_long btn);
 

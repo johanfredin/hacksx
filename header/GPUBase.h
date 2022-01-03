@@ -23,6 +23,8 @@
 
 #define GPUB_GS_SORT_FAST_OBJ(gs_obj) GsSortFastSprite(gs_obj, gpub_curr_ot(), gpub_gs_prio--)
 
+#define GPUB_GS_SORT_POLY(poly) GsSortPoly(poly, gpub_curr_ot(), gpub_gs_prio--)
+
 #define GPUB_GS_SORT_OBJ(gs_obj) GsSortSprite(gs_obj, gpub_curr_ot(), gpub_gs_prio--)
 
 #define GPUB_BG_COLOR_R 0

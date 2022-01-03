@@ -19,6 +19,8 @@
  */
 void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ...);
 
+void logr_log_tmp(char *msg, ...);
+
 #define LOGR_LOG_GOBJ(level, gobj)                                                    \
     logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*********************");     \
     logr_log(level, "Logger.h", "LOGR_LOG_GOBJ", "*   Game Object     *");     \
@@ -54,11 +56,13 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "*********************");                           \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "*   Dialog          *");                           \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "*********************");                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "id=%s", (dlg)->id);                                \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "x=%d", (dlg)->x);                                  \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "y=%d", (dlg)->y);                                  \
+    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "visible=%d", (dlg)->visible);                      \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "ticks_per_frame=%d", (dlg)->ticks_per_frame);      \
-    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "n_messages=%d", (dlg)->n_messages);                \
-    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "acc_ticks=%d", (dlg)->acc_ticks)
+    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "n_messages=%d", (dlg)->n_messages)
+
 
 #define LOGR_LOG_MSG(level, msg) \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "*********************");                   \
@@ -66,7 +70,8 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "*********************");                   \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "strlen=%d", (msg)->strlen);                \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "acc_chars=%d", (msg)->acc_chars);          \
-    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "active=%d", (msg)->active)
+    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "active=%d", (msg)->active);                \
+    logr_log(level, "Logger.h", "LOGR_LOG_DLG", "acc_ticks=%d", (msg)->acc_ticks)
 
 
 #endif // PSX_LOGGER_H
