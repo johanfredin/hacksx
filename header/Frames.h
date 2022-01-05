@@ -22,6 +22,13 @@ typedef struct CollisionBlock {
     u_char amount;
 } CollisionBlock;
 
+typedef struct Dialog {
+    RECT bounds;
+    char *text;
+    u_short max_chars;
+    u_char n_lines;
+} Dialog;
+
 typedef struct SpriteLayer {
     GsSPRITE **sprites;
     u_short sprites_cnt;
@@ -38,9 +45,10 @@ typedef struct FR_TileSet {
 
 typedef struct Frame {
     SpriteLayer *bg_layers, *fg_layers;
-    u_char t_amount, offset_x, offset_y;
+    u_char t_amount, d_amount, offset_x, offset_y;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
+    Dialog *dialogs;
     GameObject *game_object;
     FR_TileSet *fr_tilesets;
 } Frame;

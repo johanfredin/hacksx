@@ -40,6 +40,17 @@ typedef struct ObjectLayer_Teleport {
     struct ObjectLayer_Teleport *next;
 } ObjectLayer_Teleport;
 
+typedef struct ObjectLayer_Dialog {
+    u_int width, height;
+    u_int id;
+    u_char visible;
+    u_int x, y;
+    char *text;
+    u_short max_chars;
+    u_char n_lines;
+    struct ObjectLayer_Dialog *next;
+} ObjectLayer_Dialog;
+
 typedef struct Layer_Data {
     u_short id;
     struct Layer_Data *next;
@@ -74,9 +85,12 @@ typedef struct Tile_Map {
     ObjectLayer_Bounds *bounds;
     // Pointer to linked list of teleports
     ObjectLayer_Teleport *teleports;
-    u_char bounds_cnt, layers_cnt, teleports_cnt, tilesets_cnt;
+    // Pointer to linked list of dialogs
+    ObjectLayer_Dialog  *dialogs;
     // Pointer to linked list of tilesets
     Tile_Set *tile_sets;
+
+    u_char bounds_cnt, layers_cnt, teleports_cnt, tilesets_cnt, dialogs_cnt;
 } Tile_Map;
 
 

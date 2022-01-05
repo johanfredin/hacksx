@@ -50,9 +50,9 @@ void map_init(u_char level) {
     init_frame(&g_map_frames[g_frame_cnt++], "TS8_IN3.JSON");
 
     // Cleanup
-    for (i = 0; i < g_assets_cnt; i++) {
-        CDR_DATA_FREE(g_map_cdr_data_assets[i])
-    }
+//    for (i = 0; i < g_assets_cnt; i++) {
+//        CDR_DATA_FREE(g_map_cdr_data_assets[i])
+//    }
     MEM_FREE_3_AND_NULL(g_map_cdr_data_assets);
 }
 
@@ -106,9 +106,11 @@ void init_frame(Frame *frame, char *json_map_file) {
     Tile_Map *tile_map;
     ObjectLayer_Bounds *curr_b;
     ObjectLayer_Teleport *curr_t;
+    ObjectLayer_Dialog *curr_d;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
-    u_char blocks_cnt, teleports_cnt, i;
+    Dialog *dialogs;
+    u_char blocks_cnt, teleports_cnt, dialogs_cnt, i;
 
     // Map coords
     u_short map_w, map_h;
@@ -153,6 +155,23 @@ void init_frame(Frame *frame, char *json_map_file) {
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
+
+    // Init dialogs
+    dialogs = NULL; // Init to NULL since there can be frames without dialogs
+    dialogs_cnt = tile_map->dialogs_cnt;
+    dialogs = MEM_CALLOC_3(dialogs_cnt, Dialog);
+    for (i = 0, curr_d = tile_map->dialogs; curr_d != NULL; i++, curr_d = curr_d->next) {
+        u_short x = curr_d->x + frame->offset_x;
+        u_short y = curr_d->y + frame->offset_y;
+
+        dialogs[i].bounds = get_rect((short) x, (short) y, (short) curr_d->width, (short) curr_d->height);
+        dialogs[i].n_lines = curr_d->n_lines;
+        dialogs[i].max_chars = curr_d->max_chars;
+        dialogs[i].text = curr_d->text;
+        logr_log(DEBUG, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, dialogs[i].text);
+    }
+    frame->d_amount = dialogs_cnt;
+    frame->dialogs = dialogs;
 
     // Init teleports
     teleports_cnt = tile_map->teleports_cnt;
