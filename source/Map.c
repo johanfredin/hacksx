@@ -5,23 +5,33 @@
 #include "../header/TileFetcher.h"
 #include "../header/StrUtils.h"
 #include "../header/FntLogger.h"
+#include "../header/Logger.h"
+#include "../header/TextBox.h"
 
 #include <LIBETC.H>
+#include <stdio.h>
 
 #define MAP_START_FRAME 0
+#define MAP_DIALOGS_IN_FRAME(dlg_cnt) dlg_cnt | 0
 
 Frame *g_map_frames;
 FR_TileSet **g_map_tile_sets;
 CdrData **g_map_cdr_data_assets;
+Font *g_fnt;
+VerticalGoraudColor *g_canvas_clr;
 
 u_char g_assets_cnt = 0, g_map_tilesets_count = 0;
 u_char g_frame_cnt;
 u_char g_current_frame = MAP_START_FRAME;
 
 void init_frame(Frame *frame, char *json_map_file);
+void frame_init_collision_blocks(Tile_Map *tile_map, Frame *frame);
+void frame_init_teleports(Tile_Map *tile_map, Frame *frame);
+void frame_init_dialogs(Tile_Map *tile_map, Frame *frame);
 RECT get_rect(short x, short y, short w, short h);
 void handle_block_collision(GameObject *gobj, Frame *frame);
 void handle_teleport_collision(GameObject *gobj, Frame *frame);
+void handle_dialog_collision(GameObject *gobj, Frame *frame);
 void load_level_assets_from_cd(u_char level);
 
 /**
@@ -39,6 +49,12 @@ void map_init(u_char level) {
     u_char i;
     load_level_assets_from_cd(level);
     load_tilesets();
+
+    // Load font and dialog bg color
+    g_fnt = txt_fnt_init("FONT.TIM", 8, 8, TXT_FNT_PADDING_DEFAULT);
+    g_canvas_clr = MEM_MALLOC_3(VerticalGoraudColor);
+    TBX_INIT_VERT_GORAUD_COLOR(g_canvas_clr, 10, 10, 40, 0, 0, 200 - 40);
+
 
     g_map_frames = MEM_CALLOC_3(8, Frame);
     init_frame(&g_map_frames[g_frame_cnt++], "TS8_TL.JSON");
@@ -104,13 +120,6 @@ void init_frame(Frame *frame, char *json_map_file) {
     u_long *content;
     JSON_Data *json_map_data;
     Tile_Map *tile_map;
-    ObjectLayer_Bounds *curr_b;
-    ObjectLayer_Teleport *curr_t;
-    ObjectLayer_Dialog *curr_d;
-    CollisionBlock *collision_blocks;
-    Teleport *teleports;
-    Dialog *dialogs;
-    u_char blocks_cnt, teleports_cnt, dialogs_cnt, i;
 
     // Map coords
     u_short map_w, map_h;
@@ -120,7 +129,7 @@ void init_frame(Frame *frame, char *json_map_file) {
     json_cdr_data = cdr_find_data_entry(json_map_file, g_map_cdr_data_assets, g_assets_cnt);
     logr_log(INFO, "Map.c", "init_frame", "JSON file=%s retrieved", json_map_file);
     content = json_cdr_data->file;
-    json_map_data = jsonp_parse((char *)content);
+    json_map_data = jsonp_parse((char *) content);
     tile_map = tiled_populate_from_json(json_map_data);
     tiled_print_map(DEBUG, tile_map);
     frame->fr_tilesets = transfer_to_frame_tileset(tile_map);
@@ -144,37 +153,36 @@ void init_frame(Frame *frame, char *json_map_file) {
     // Load tilesets (frame may consist of multiple tilesets)
     tf_add_layers_to_frame(frame, frame->fr_tilesets, g_map_tilesets_count, tile_map);
 
-    // Init collision blocks
-    blocks_cnt = tile_map->bounds_cnt;
+    // Add collision blocks, teleports and dialogs from tile map
+    frame_init_collision_blocks(tile_map, frame);
+    frame_init_teleports(tile_map, frame);
+    frame_init_dialogs(tile_map, frame);
+
+    // Housekeeping
+    jsonp_free(json_map_data);
+    tiled_free(tile_map);
+}
+
+void frame_init_collision_blocks(Tile_Map *tile_map, Frame *frame) {
+    int i;
+    CollisionBlock *collision_blocks;
+    ObjectLayer_Bounds *curr_b;
+    u_char blocks_cnt = tile_map->bounds_cnt;
     MAP_MALLOC_COLLISION_BLOCK(collision_blocks, blocks_cnt);
     for (i = 0, curr_b = tile_map->bounds; curr_b != NULL; i++, curr_b = curr_b->next) {
         u_short x = curr_b->x + frame->offset_x;
         u_short y = curr_b->y + frame->offset_y;
-
         collision_blocks->bounds[i] = get_rect((short) x, (short) y, (short) curr_b->width, (short) curr_b->height);
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
+}
 
-    // Init dialogs
-    dialogs = NULL; // Init to NULL since there can be frames without dialogs
-    dialogs_cnt = tile_map->dialogs_cnt;
-    dialogs = MEM_CALLOC_3(dialogs_cnt, Dialog);
-    for (i = 0, curr_d = tile_map->dialogs; curr_d != NULL; i++, curr_d = curr_d->next) {
-        u_short x = curr_d->x + frame->offset_x;
-        u_short y = curr_d->y + frame->offset_y;
-
-        dialogs[i].bounds = get_rect((short) x, (short) y, (short) curr_d->width, (short) curr_d->height);
-        dialogs[i].n_lines = curr_d->n_lines;
-        dialogs[i].max_chars = curr_d->max_chars;
-        dialogs[i].text = curr_d->text;
-        logr_log(DEBUG, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, dialogs[i].text);
-    }
-    frame->d_amount = dialogs_cnt;
-    frame->dialogs = dialogs;
-
-    // Init teleports
-    teleports_cnt = tile_map->teleports_cnt;
+void frame_init_teleports(Tile_Map *tile_map, Frame *frame) {
+    int i;
+    ObjectLayer_Teleport *curr_t;
+    Teleport *teleports;
+    u_char teleports_cnt = tile_map->teleports_cnt;
     teleports = MEM_CALLOC_3(teleports_cnt, Teleport);
     for (i = 0, curr_t = tile_map->teleports; curr_t != NULL; i++, curr_t = curr_t->next) {
         u_short x = curr_t->x + frame->offset_x;
@@ -186,14 +194,80 @@ void init_frame(Frame *frame, char *json_map_file) {
         teleports[i].dest_y = curr_t->dest_y;
         teleports[i].dest_frame = curr_t->dest_frame;
 
-        logr_log(DEBUG, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x, teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
+//        logr_log(DEBUG, "Map.c", "init_frame", "Dest x=%d, y=%d, frame=%d, name=%s", teleports[i].dest_x,
+//                 teleports[i].dest_y, teleports[i].dest_frame, json_map_file);
     }
     frame->t_amount = teleports_cnt;
     frame->teleports = teleports;
+}
 
-    // Housekeeping
-    jsonp_free(json_map_data);
-    tiled_free(tile_map);
+void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
+    u_char dialogs_cnt = tile_map->dialogs_cnt;
+    if (MAP_DIALOGS_IN_FRAME(dialogs_cnt)) {  // Load dialogs from tile map if present
+        int i;
+        ObjectLayer_Dialog *curr_d;
+        FR_Dialog *dialogs;
+        dialogs = MEM_CALLOC_3(dialogs_cnt, FR_Dialog);
+        for (i = 0, curr_d = tile_map->dialogs; curr_d != NULL; i++, curr_d = curr_d->next) {
+            char *token;
+            int msg_idx;
+            DlgBox *dlgBox;
+            Dialog *dialog;
+            char **strs;
+            u_short x = curr_d->x + frame->offset_x;
+            u_short y = curr_d->y + frame->offset_y;
+            short dlg_x = 20, dlg_y = 60;
+            short dlg_target_w, dlg_target_h;
+            u_char n_messages = 1;  // There is always at least 1 message
+
+            dialogs[i].bounds = get_rect((short) x, (short) y, (short) curr_d->width, (short) curr_d->height);
+            dialogs[i].n_lines = curr_d->n_lines;
+            dialogs[i].max_chars = curr_d->max_chars;
+
+            // Create a dialog struct from acquired properties in tiled map editor.
+            dlg_target_w = (short) ((curr_d->max_chars * g_fnt->cw) + (g_fnt->padding * 2));
+            dlg_target_h = (short) ((curr_d->n_lines * g_fnt->ch) + (g_fnt->padding * 2));
+
+            // Calculate length of str array
+            for (msg_idx = 0; msg_idx < strlen(curr_d->text); msg_idx++) {
+                if (curr_d->text[msg_idx] == ';') {
+                    n_messages++;
+                }
+            }
+
+            strs = MEM_CALLOC_3_PTRS(n_messages, char);
+            token = strtok(curr_d->text, ";");
+            for(msg_idx = 0; token != NULL; msg_idx++) {
+                if(msg_idx > n_messages) {
+                    logr_log(ERROR, "Map.c", "frame_init_dialogs", "More tokens in map str than allocated for, shutting down...");
+                    exit(1);
+                }
+                strs[msg_idx] = token;
+                token = strtok(NULL, ";");
+            }
+
+            // Now we have the message tokens, lets create a dialog
+            dialog = txt_dlg_init(strs, NULL, n_messages, g_fnt, 3, dlg_x + g_fnt->padding, dlg_y + g_fnt->padding, 0);
+            dlgBox = tbx_init_dlg_box(dlg_x, dlg_y, 0, 0, dlg_target_w, dlg_target_h, g_canvas_clr, dialog);
+
+            // Assign to array
+            dialogs[i].content = dlgBox;
+
+            logr_log(DEBUG, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, curr_d->text);
+
+            // remove allocated strings, no longer needed
+            for(msg_idx = 0; msg_idx < n_messages - 1; msg_idx++) {
+                printf("%s\n", strs[msg_idx]);
+//                free(strs[msg_idx]);
+            }
+            MEM_FREE_3_AND_NULL(strs);
+
+            frame->d_amount = dialogs_cnt;
+            frame->dialogs = dialogs;
+        }
+    } else {
+        frame->dialogs = NULL; // set to NULL since there can be frames without dialogs
+    }
 }
 
 FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
@@ -206,7 +280,7 @@ FR_TileSet *transfer_to_frame_tileset(Tile_Map *map) {
         u_char i;
 
         // Iterate the map FR_Tileset array to look for a matching image
-        for(i = 0; i < g_map_tilesets_count; i++) {
+        for (i = 0; i < g_map_tilesets_count; i++) {
             u_char count;
             char *source = curr_ts->source;
             char substr[16];
@@ -275,8 +349,14 @@ void map_draw(Player *player) {
         }
     }
 
-    FNT_PRINT_BLOCKS(g_current_frame, frame)
+    if (frame->dialogs != NULL) {
+        u_char i;
+        for (i = 0; i < frame->d_amount; i++) {
+            tbx_draw(frame->dialogs[i].content);
+        }
+    }
 
+    FNT_PRINT_BLOCKS(g_current_frame, frame)
 }
 
 void map_tick(Player *player) {
@@ -284,7 +364,7 @@ void map_tick(Player *player) {
     // TEMP
     u_long btn = PadRead(1);
     if (btn & PADselect) {
-        if (g_current_frame >= 3) {
+        if (g_current_frame >= g_frame_cnt) {
             g_current_frame = 0;
         } else {
             g_current_frame++;
@@ -294,6 +374,16 @@ void map_tick(Player *player) {
     gobj_player_tick(player);
     handle_teleport_collision(player->gobj, frame);
     handle_block_collision(player->gobj, frame);
+
+    if (frame->dialogs != NULL) {
+//        u_char i;
+//        for (i = 0; i < frame->d_amount; i++) {
+//            tbx_tick(frame->dialogs[i].content);
+//        }
+        handle_dialog_collision(player->gobj, frame);
+    }
+
+    // Update potential game objects in frame (other than player)
     if (frame->game_object != NULL) {
         gobj_tick(frame->game_object);
         handle_block_collision(frame->game_object, frame);
@@ -321,8 +411,8 @@ void handle_block_collision(GameObject *gobj, Frame *frame) {
         short by = bounds->y;
         short bw = bounds->w;
         short bh = bounds->h;
-        short bxw = (short)(bx + bw);
-        short byh = (short)(by + bh);
+        short bxw = (short) (bx + bw);
+        short byh = (short) (by + bh);
 
         right_col = pxw >= bx && px <= bx && pyh > by && py < byh;
         left_col = px <= bxw && pxw > bxw && pyh > by && py < byh;
@@ -332,13 +422,13 @@ void handle_block_collision(GameObject *gobj, Frame *frame) {
         switch (gobj->type) {
             case GOBJ_TYPE_PLAYER:
                 if (right_col) {
-                    gobj->sprite->x = (short)(bx - pw);
+                    gobj->sprite->x = (short) (bx - pw);
                 }
                 if (left_col) {
                     gobj->sprite->x = bxw;
                 }
                 if (top_col) {
-                    gobj->sprite->y = (short)(by - ph);
+                    gobj->sprite->y = (short) (by - ph);
                 }
                 if (bottom_col) {
                     gobj->sprite->y = byh;
@@ -407,6 +497,45 @@ void handle_teleport_collision(GameObject *gobj, Frame *frame) {
                     }
                     break;
             }
+        }
+        i++;
+    }
+}
+
+void handle_dialog_collision(GameObject *gobj, Frame *frame) {
+    u_char right_col, leftCol, top_col, bottom_col;
+    FR_Dialog *dialogs = frame->dialogs;
+    int i = 0;
+
+    // Player bounds
+    short px = gobj->sprite->x;
+    short py = gobj->sprite->y;
+    u_short pw = gobj->sprite->w;
+    u_short ph = gobj->sprite->h;
+    u_short pxw = px + pw;
+    u_short pyh = py + ph;
+    while (i < frame->d_amount) {
+        FR_Dialog *d = &dialogs[i];
+        RECT bounds = d->bounds;
+        short bx = bounds.x;
+        short by = bounds.y;
+        u_short bw = bounds.w;
+        u_short bh = bounds.h;
+        u_short bxw = bx + bw;
+        u_short byh = by + bh;
+
+        right_col = pxw >= bx && px <= bx && pyh > by && py < byh;
+        leftCol = px <= bxw && pxw > bxw && pyh > by && py < byh;
+        top_col = pyh >= by && py < by && pxw > bx && px < bxw;
+        bottom_col = py <= byh && pyh > byh && pxw > bx && px < bxw;
+
+        if (right_col | leftCol | top_col | bottom_col) {
+            if (d->content->complete) {
+                gobj->can_move = 0;
+            }
+
+            logr_log_tmp("Collision");
+            break;
         }
         i++;
     }

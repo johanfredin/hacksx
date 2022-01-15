@@ -7,6 +7,7 @@
 #include <LIBGS.H>
 
 #include "GameObject.h"
+#include "TextBox.h"
 
 typedef struct Teleport {
     RECT origin;
@@ -22,12 +23,13 @@ typedef struct CollisionBlock {
     u_char amount;
 } CollisionBlock;
 
-typedef struct Dialog {
+typedef struct FR_Dialog {
+    // If we collide with these bounds and press interact button then dialog can play (if not playing already)
     RECT bounds;
-    char *text;
     u_short max_chars;
     u_char n_lines;
-} Dialog;
+    DlgBox *content;
+} FR_Dialog;
 
 typedef struct SpriteLayer {
     GsSPRITE **sprites;
@@ -48,7 +50,7 @@ typedef struct Frame {
     u_char t_amount, d_amount, offset_x, offset_y;
     CollisionBlock *collision_blocks;
     Teleport *teleports;
-    Dialog *dialogs;
+    FR_Dialog *dialogs;
     GameObject *game_object;
     FR_TileSet *fr_tilesets;
 } Frame;

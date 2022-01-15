@@ -20,7 +20,8 @@ typedef struct GameObject {
     u_short w, h;
     u_char spawn_x, spawn_y, type;
     short x_speed, y_speed;
-    u_char health;
+    u_char health: 7;
+    u_char can_move: 1;
     u_char heading;
 } GameObject;
 
