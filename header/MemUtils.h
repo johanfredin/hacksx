@@ -12,6 +12,7 @@
 #define MEM_MALLOC_3(type) (type *)malloc(sizeof(type))
 
 #define MEM_MALLOC_3_CUS_SIZE(type, size) (type *)malloc(size)
+#define MEM_MALLOC_3_STRS(n_chars) malloc(sizeof(char *) * n_chars)
 #define MEM_CALLOC_3_PTRS(n, t) (t **)calloc((size_t)n, sizeof(t *))
 #define MEM_CALLOC_3(n, t) (t *)calloc((size_t)n, sizeof(t))
 
@@ -26,6 +27,12 @@
         linked_list_root = linked_list_root->next; \
         MEM_FREE_3_AND_NULL(linked_list_aux);      \
     }
+
+#define MEM_FREE_STRS(char_array, i, n)     \
+   for (i = 0; i < n; i++) {                \
+     MEM_FREE_3_AND_NULL(char_array[i]);    \
+}                                           \
+MEM_FREE_3_AND_NULL(char_array)
 
 /**
  * Create another entry in the linked list we are creating if the linked

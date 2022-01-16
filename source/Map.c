@@ -172,7 +172,9 @@ void frame_init_collision_blocks(Tile_Map *tile_map, Frame *frame) {
     for (i = 0, curr_b = tile_map->bounds; curr_b != NULL; i++, curr_b = curr_b->next) {
         u_short x = curr_b->x + frame->offset_x;
         u_short y = curr_b->y + frame->offset_y;
-        collision_blocks->bounds[i] = get_rect((short) x, (short) y, (short) curr_b->width, (short) curr_b->height);
+        if (collision_blocks != NULL) {
+            collision_blocks->bounds[i] = get_rect((short) x, (short) y, (short) curr_b->width, (short) curr_b->height);
+        }
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
@@ -208,6 +210,7 @@ void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
         ObjectLayer_Dialog *curr_d;
         FR_Dialog *dialogs;
         dialogs = MEM_CALLOC_3(dialogs_cnt, FR_Dialog);
+        dialogs->content = NULL;
         for (i = 0, curr_d = tile_map->dialogs; curr_d != NULL; i++, curr_d = curr_d->next) {
             char *token;
             int msg_idx;
@@ -255,15 +258,15 @@ void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
 
             logr_log(DEBUG, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, curr_d->text);
 
+            frame->dialogs = dialogs;
+            frame->d_amount = dialogs_cnt;
+
             // remove allocated strings, no longer needed
-            for(msg_idx = 0; msg_idx < n_messages - 1; msg_idx++) {
+            for(msg_idx = 0; msg_idx < n_messages; msg_idx++) {
                 printf("%s\n", strs[msg_idx]);
-//                free(strs[msg_idx]);
+                free(strs[msg_idx]);
             }
             MEM_FREE_3_AND_NULL(strs);
-
-            frame->d_amount = dialogs_cnt;
-            frame->dialogs = dialogs;
         }
     } else {
         frame->dialogs = NULL; // set to NULL since there can be frames without dialogs

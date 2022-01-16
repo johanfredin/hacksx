@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdio.h>
+#include "../header/MemUtils.h"
 
 #include "../header/GameObject.h"
 #include "../header/JSONParser.h"
@@ -18,13 +19,27 @@ void test_map() {
 
 void string_stuff() {
     // Let's try to turn this into an array of strings
-    char yolo[] = "Hey;Youdo good;mofo";
-    char *vals = strtok(yolo, ";");
-    printf("values=%s", vals);
+    int i;
+    char yolo[] = "Hey;Youdo good;mofo\0";
+//    char **arr = MEM_CALLOC_STR(strlen(yolo));
+    char **arr = MEM_MALLOC_3_STRS(strlen(yolo));
+
+    size_t n_strs = 0;
+
+    char *tok = strtok(yolo, ";");
+    while (tok != NULL) {
+        size_t n = strlen(tok) + 1;
+        arr[n_strs] = MEM_MALLOC_3_STRS(n);
+        strcpy(arr[n_strs], tok);
+        tok = strtok(NULL, ";");
+        n_strs++;
+    }
+    MEM_FREE_STRS(arr, i, n_strs);
 }
 
 int main() {
     logr_log_tmp("Hello Hacksx!");
-    test_map();
+//    test_map();
+    string_stuff();
 }
 
