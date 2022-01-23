@@ -246,6 +246,10 @@ void get_object(JSON_Data *entry) {
 JSON_Data *malloc_json_entry() {
     Type zeroType = {0, 0, 0, 0, 0, 0};
     JSON_Data *data = MEM_MALLOC_3(JSON_Data);
+    if (data == NULL) {
+        logr_log(ERROR, "JSONParser.c", "malloc_json_entry", "Unable to allocate memory for JSON_Data entry, exiting...");
+        exit(1);
+    }
     data->key = NULL;
     data->value = NULL;
     data->next = NULL;

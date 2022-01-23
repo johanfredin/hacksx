@@ -51,7 +51,7 @@ typedef struct Dialog {
 Font *txt_fnt_init(char *name, u_char cw, u_char ch, u_char padding);
 
 Dialog *txt_dlg_init(char **strs, char *id, u_char n_messages, Font *fnt, u_short ticks_per_frame, u_char x, u_char y, u_char visible);
-Message *txt_msg_init(Font *font, u_char x, u_char y, char *str, u_char make_static, u_char active);
+void *txt_msg_init(Message *msg, Font *font, u_char x, u_char y, char *str, u_char make_static, u_char active);
 
 void txt_msg_draw(Message *msg);
 void txt_dlg_draw(Dialog *dlg);

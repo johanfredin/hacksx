@@ -66,9 +66,11 @@ void map_init(u_char level) {
     init_frame(&g_map_frames[g_frame_cnt++], "TS8_IN3.JSON");
 
     // Cleanup
-//    for (i = 0; i < g_assets_cnt; i++) {
-//        CDR_DATA_FREE(g_map_cdr_data_assets[i])
-//    }
+    for (i = 0; i < g_assets_cnt; i++) {
+//        free(g_map_cdr_data_assets[i]->file);
+//        free(g_map_cdr_data_assets[i]);
+        CDR_DATA_FREE(g_map_cdr_data_assets[i])
+    }
     MEM_FREE_3_AND_NULL(g_map_cdr_data_assets);
 }
 
@@ -77,7 +79,7 @@ void load_level_assets_from_cd(u_char level) {
     logr_log(INFO, "Map.c", "load_level_assets_from_cd", "* ADDING ASSETS FOR LEVEL NR %d *", level);
     logr_log(INFO, "Map.c", "load_level_assets_from_cd", "*********************************");
     if (level == 1) {
-        g_map_cdr_data_assets = MEM_CALLOC_3_PTRS(10, CdrData);
+        g_map_cdr_data_assets = MEM_CALLOC_3_PTRS(12, CdrData);
         // Load tile sets
         g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_TL.TIM");
         g_map_cdr_data_assets[g_map_tilesets_count++] = cdr_read_file("TS8_TR.TIM");
@@ -212,16 +214,22 @@ void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
         dialogs = MEM_CALLOC_3(dialogs_cnt, FR_Dialog);
         dialogs->content = NULL;
         for (i = 0, curr_d = tile_map->dialogs; curr_d != NULL; i++, curr_d = curr_d->next) {
-            char *token;
+            char **strs = MEM_MALLOC_3_STRS(strlen(curr_d->text));
+            char *token = strtok(curr_d->text, ";");
             int msg_idx;
             DlgBox *dlgBox;
             Dialog *dialog;
-            char **strs;
             u_short x = curr_d->x + frame->offset_x;
             u_short y = curr_d->y + frame->offset_y;
             short dlg_x = 20, dlg_y = 60;
             short dlg_target_w, dlg_target_h;
-            u_char n_messages = 1;  // There is always at least 1 message
+            u_char n_messages;
+            for (n_messages = 0; token != NULL; n_messages++) {
+                size_t n = strlen(token) + 1;
+                strs[n_messages] = MEM_MALLOC_3_STRS(n);
+                memcpy(strs[n_messages], token, n);
+                token = strtok(NULL, ";");
+            }
 
             dialogs[i].bounds = get_rect((short) x, (short) y, (short) curr_d->width, (short) curr_d->height);
             dialogs[i].n_lines = curr_d->n_lines;
@@ -231,24 +239,6 @@ void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
             dlg_target_w = (short) ((curr_d->max_chars * g_fnt->cw) + (g_fnt->padding * 2));
             dlg_target_h = (short) ((curr_d->n_lines * g_fnt->ch) + (g_fnt->padding * 2));
 
-            // Calculate length of str array
-            for (msg_idx = 0; msg_idx < strlen(curr_d->text); msg_idx++) {
-                if (curr_d->text[msg_idx] == ';') {
-                    n_messages++;
-                }
-            }
-
-            strs = MEM_CALLOC_3_PTRS(n_messages, char);
-            token = strtok(curr_d->text, ";");
-            for(msg_idx = 0; token != NULL; msg_idx++) {
-                if(msg_idx > n_messages) {
-                    logr_log(ERROR, "Map.c", "frame_init_dialogs", "More tokens in map str than allocated for, shutting down...");
-                    exit(1);
-                }
-                strs[msg_idx] = token;
-                token = strtok(NULL, ";");
-            }
-
             // Now we have the message tokens, lets create a dialog
             dialog = txt_dlg_init(strs, NULL, n_messages, g_fnt, 3, dlg_x + g_fnt->padding, dlg_y + g_fnt->padding, 0);
             dlgBox = tbx_init_dlg_box(dlg_x, dlg_y, 0, 0, dlg_target_w, dlg_target_h, g_canvas_clr, dialog);
@@ -256,17 +246,16 @@ void frame_init_dialogs(Tile_Map *tile_map, Frame *frame) {
             // Assign to array
             dialogs[i].content = dlgBox;
 
-            logr_log(DEBUG, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, curr_d->text);
+            logr_log(INFO, "Map.c", "init_frame", "Dialog n_lines=%d, max_chars=%d, text=%s", dialogs[i].n_lines, dialogs[i].max_chars, curr_d->text);
 
             frame->dialogs = dialogs;
             frame->d_amount = dialogs_cnt;
 
             // remove allocated strings, no longer needed
             for(msg_idx = 0; msg_idx < n_messages; msg_idx++) {
-                printf("%s\n", strs[msg_idx]);
-                free(strs[msg_idx]);
+                printf("curr=%s\n", strs[msg_idx]);
             }
-            MEM_FREE_3_AND_NULL(strs);
+            MEM_FREE_STRS(strs, msg_idx, n_messages);
         }
     } else {
         frame->dialogs = NULL; // set to NULL since there can be frames without dialogs

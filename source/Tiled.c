@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "../header/Tiled.h"
 #include "../header/Logger.h"
 #include "../header/StrUtils.h"
@@ -16,12 +15,11 @@ Tile_Map *malloc_tile_map();
 
 Tile_Map *tiled_populate_from_json(JSON_Data *root) {
     JSON_Data *curr;
-    Tile_Map *tm;
+    Tile_Map *tm = malloc_tile_map();
     if (root == NULL) {
         logr_log(ERROR, "Tiled.c", "tiled_populate_from_json", "root is NULL");
         exit(1);
     }
-    tm = malloc_tile_map();
     for (curr = root; curr != NULL; curr = curr->next) {
         char *key = curr->key;
         void *value = curr->value;
@@ -48,8 +46,10 @@ Tile_Map *malloc_tile_map() {
     tm->layers = NULL;
     tm->bounds = NULL;
     tm->teleports = NULL;
+    tm->dialogs = NULL;
     tm->bounds_cnt = 0;
     tm->teleports_cnt = 0;
+    tm->dialogs_cnt = 0;
     return tm;
 }
 
