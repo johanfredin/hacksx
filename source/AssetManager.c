@@ -72,8 +72,8 @@ GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blen
     asmg_load_asset(asset, cdr_data, num_color_bits);
     sprite = MEM_MALLOC_3(GsSPRITE);
     sprite->attribute = asset->sprite_attr;
-    sprite->x = (short) x;
-    sprite->y = (short) y;
+    sprite->x = x;
+    sprite->y = y;
     sprite->w = asset->frame_buffer->w * asset->t_width_multiplier;
     sprite->h = asset->frame_buffer->h;
     sprite->tpage = GetTPage(asset->color_mode, 1, asset->frame_buffer->x, asset->frame_buffer->y);

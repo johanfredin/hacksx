@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 #include "../header/MemUtils.h"
 
 #include "../header/GameObject.h"
@@ -16,11 +17,12 @@ void string_stuff() {
 
     size_t n_strs = 0;
 
-    char *tok = strtok(yolo, ";");
+    char *tok = strtok(yolo, "!");
     while (tok != NULL) {
         size_t n = strlen(tok) + 1;
         arr[n_strs] = MEM_MALLOC_3_STRS(n);
         strcpy(arr[n_strs], tok);
+        printf("tok=%s\n", tok);
         tok = strtok(NULL, ";");
         n_strs++;
     }
@@ -29,6 +31,7 @@ void string_stuff() {
 
 int main() {
     logr_log_tmp("Hello Hacksx!");
-    test_map();
+    string_stuff();
+//    test_map();
 }
 

@@ -67,8 +67,6 @@ void map_init(u_char level) {
 
     // Cleanup
     for (i = 0; i < g_assets_cnt; i++) {
-//        free(g_map_cdr_data_assets[i]->file);
-//        free(g_map_cdr_data_assets[i]);
         CDR_DATA_FREE(g_map_cdr_data_assets[i])
     }
     MEM_FREE_3_AND_NULL(g_map_cdr_data_assets);
@@ -174,9 +172,7 @@ void frame_init_collision_blocks(Tile_Map *tile_map, Frame *frame) {
     for (i = 0, curr_b = tile_map->bounds; curr_b != NULL; i++, curr_b = curr_b->next) {
         u_short x = curr_b->x + frame->offset_x;
         u_short y = curr_b->y + frame->offset_y;
-        if (collision_blocks != NULL) {
-            collision_blocks->bounds[i] = get_rect((short) x, (short) y, (short) curr_b->width, (short) curr_b->height);
-        }
+        collision_blocks->bounds[i] = get_rect((short) x, (short) y, (short) curr_b->width, (short) curr_b->height);
     }
     collision_blocks->amount = blocks_cnt;
     frame->collision_blocks = collision_blocks;
