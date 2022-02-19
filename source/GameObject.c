@@ -123,7 +123,7 @@ void gobj_anim_tick(Animation *anim, GameObject *gobj) {
             u += sprite_w; // Move to next frame when not at the end of horizontal sheet.
         }
         if(u & sprite_w) {
-            ASMG_AUDIO_PLAY(SFX_WALK);
+//            ASMG_AUDIO_PLAY(SFX_WALK);
         }
     } else {
         anim->acc_ticks++;

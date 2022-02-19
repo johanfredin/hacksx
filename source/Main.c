@@ -26,12 +26,6 @@ int main() {
 
     asmg_init_tim_data(&TexInfo, &data_tim, ASMG_COLOR_BITS_4);
     initBG();
-
-    while (1) {
-        gpub_clear_display();
-        GPUB_GS_SORT_FAST_BG(&BGData);
-        gpub_display();
-    }
 }
 
 void initBG() {

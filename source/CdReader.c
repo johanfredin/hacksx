@@ -41,11 +41,6 @@ CdrData *cdr_read_file(char *file_path) {
     return data;
 }
 
-void cdr_data_free(CdrData *cdr_data) {
-    MEM_FREE_3_AND_NULL(cdr_data->file);
-    MEM_FREE_3_AND_NULL(cdr_data);
-}
-
 CdrData *cdr_read_single_file(char *file_path) {
     CdrData *cdr_data;
     cdr_open();
