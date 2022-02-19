@@ -14,6 +14,7 @@
 #define ASMG_COLOR_BITS_16 0x10
 #define ASMG_SOUND_MALLOC_MAX 0xA
 #define ASMG_VAG_HEADER_BYTE_SIZE 0x30
+#define ASMG_BLEND_NORMAL 128
 
 typedef struct VramAsset {
     RECT *frame_buffer;
@@ -29,9 +30,11 @@ typedef struct VramAsset {
     MEM_FREE_3_AND_NULL((asset)->clut);         \
     MEM_FREE_3_AND_NULL(asset)
 
+void asmg_init_tim_data(GsIMAGE *tim_data, CdrData *cdr_data, u_short num_color_bits);
 void asmg_load_asset(VramAsset *vram_asset, CdrData *cdr_data, u_short num_color_bits);
 void asmg_get_region(GsSPRITE *base, GsSPRITE *region, u_short x, u_short y, u_short u, u_short v, u_short w, u_short h);
 
+GsSPRITE *asmg_load_8_bit_sprite(CdrData *cdr_data, u_short x, u_short y);
 GsSPRITE *asmg_load_sprite(CdrData *cdr_data, u_short x, u_short y, u_short blend, u_short num_color_bits);
 
 void asmg_audio_init();

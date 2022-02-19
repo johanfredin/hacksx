@@ -5,6 +5,7 @@
 #include <LIBGTE.H>
 #include <LIBGPU.H>
 #include <LIBGS.H>
+#include <LIBETC.H>
 
 // Constants
 #define GPUB_NUM_BUFFERS 0x2
@@ -22,6 +23,8 @@
 #define GPUB_SET_BRIGHTNESS(rgb_holder, brightness) rgb_holder->r = rgb_holder->g = rgb_holder->b =  brightness
 
 #define GPUB_GS_SORT_FAST_OBJ(gs_obj) GsSortFastSprite(gs_obj, gpub_curr_ot(), gpub_gs_prio--)
+#define GPUB_GS_SORT_FAST_BG(gs_bg) GsSortFastBg(gs_bg, gpub_curr_ot(), gpub_gs_prio--)
+#define GPUB_GS_SORT_BG(gs_bg) GsSortBg(gs_bg, gpub_curr_ot(), gpub_gs_prio--)
 
 #define GPUB_GS_SORT_POLY(poly) GsSortPoly(poly, gpub_curr_ot(), gpub_gs_prio--)
 
@@ -37,7 +40,7 @@ if (assigner == 0) {                                \
     exit(1);                                        \
 } else {                                            \
     assignee = assigner;                            \
-}                                                   \
+}
 
 typedef struct Color {
     u_char r, g, b;

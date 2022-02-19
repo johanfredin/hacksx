@@ -268,7 +268,7 @@ char *read_until(char end_char, u_char include_end_char) {
         c = next_ch();
 
         if (i >= size) {
-            logr_log(ERROR, "ERROR: String exceeded max length of %i, accumulated string=%s\n", size, str);
+            logr_log(ERROR, "JSONParser.c", "read_until", "ERROR: String exceeded max length of %i, accumulated string=%s\n", size, str);
             exit(1);
         }
 
@@ -291,7 +291,7 @@ char *get_numeric_str() {
         str[i] = curr_ch();
         next_ch();
         if (i >= size) {
-            logr_log(ERROR, "ERROR: Numeric string exceeded max length of %i, accumulated string=%s\n", size, str);
+            logr_log(ERROR, "JSONParser.c", "get_numeric_str", "ERROR: Numeric string exceeded max length of %d, accumulated string=%s\n", size, str);
             exit(1);
         }
         i++;

@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/johan/CLionProjects/hacksx/header/Logger.h
+
+/mnt/c/Users/johan/CLionProjects/hacksx/source/Logger.c
+../header/Logger.h
+/mnt/c/Users/johan/CLionProjects/hacksx/header/Logger.h
+stdint.h
+-
+stdlib.h
+-
+stdarg.h
+-
+stdio.h
+-
+

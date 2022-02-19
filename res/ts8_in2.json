@@ -179,8 +179,8 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":8,
-                 "x":180,
+                 "width":13.2304674730304,
+                 "x":177.210417347717,
                  "y":32
                 }, 
                 {
@@ -200,8 +200,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":10,
- "nextobjectid":25,
+ "nextlayerid":11,
+ "nextobjectid":28,
  "orientation":"orthogonal",
  "properties":[
         {
@@ -215,7 +215,7 @@
          "value":85
         }],
  "renderorder":"right-down",
- "tiledversion":"1.4.3",
+ "tiledversion":"1.7.2",
  "tileheight":16,
  "tilesets":[
         {
@@ -232,6 +232,6 @@
         }],
  "tilewidth":16,
  "type":"map",
- "version":1.4,
+ "version":"1.6",
  "width":20
 }

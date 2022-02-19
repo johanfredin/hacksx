@@ -67,6 +67,10 @@ extern int LoadImage(RECT *rect, u_long *p);
 #define GsSortFastSprite(sprite, ot, prio) \
 LOGR_LOG_GS_OBJ(INFO, sprite)
 
+#define GsSortFastBg(bg, ot, pri) LOGR_LOG_GS_BG(TRACE, bg)
+
+#define GsInit3D()  logr_log(TRACE, "Logger.h", "LIBGS.h", "GsInit3D called")
+
 #define GsSortPoly(poly, ot, prio) \
 logr_log(TRACE, "Logger.h", "LIBGS.h", "poly sorted")
 

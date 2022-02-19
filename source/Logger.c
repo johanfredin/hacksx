@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-
 char *get_level(unsigned char level) {
     switch (level) {
         case OFF:
@@ -54,7 +53,10 @@ void logr_log(unsigned char level, char *src_file, char *src_func, char *msg, ..
                     printf("%X", va_arg(args, int));
                     break;
                 case 'c':
-                    printf("%c", va_arg(args, int));
+                    printf("%c", va_arg(args, char));
+                    break;
+                case 'p':
+                    printf("%p", va_arg(args, int));
                     break;
             }
             msg++;

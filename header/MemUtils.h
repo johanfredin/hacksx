@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define MEM_HEAP_DEFAULT_START_ADDR 0x800F8000
-#define MEM_HEAP_DEFAULT_SIZE 0x00100000
+#define MEM_HEAP_START_ADDR 0x800F8000
+#define MEM_HEAP_SIZE 0x00100000            // 1 mb heap
 
 #define MEM_INIT_HEAP_3() logr_log(INFO, "MemUtils.h", "MEM_INIT_HEAP_3", "Mock heap init called");
 

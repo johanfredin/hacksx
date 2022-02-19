@@ -8,7 +8,7 @@
 #define DEBUG 4
 #define TRACE 5
 
-#define LOG_LEVEL INFO
+#define LOG_LEVEL DEBUG
 
 /**
  * Log a message at specified level
@@ -48,7 +48,7 @@ void logr_log_tmp(char *msg, ...);
     logr_log(level, "Logger.h", "LOGR_LOG_TELEPORT", "dest_frame=%d", (&(teleport))->dest_frame)
 
 #define LOGR_LOG_SPRITE(level, sprite) \
-    logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", sprite.x, sprite.y, sprite.w, sprite.h, sprite.u, sprite.v)
+    logr_log(level, "Logger.h", "LOGR_LOG_SPRITE", "SPRITE ADDED: {x:%d, y:%d, w:%d, h:%d, u:%d, v:%d}", (sprite)->x, (sprite)->y, (sprite)->w, (sprite)->h, (sprite)->u, (sprite)->v)
 
 #define LOGR_LOG_GS_OBJ(level, gs_obj) logr_log(level, "Logger.h", "LOGR_LOG_GS_OBJ", "sprite x, y, u, v = {%d, %d, %d, %d}", (gs_obj)->x, (gs_obj)->y, (gs_obj)->u, (gs_obj)->v)
 
@@ -73,5 +73,45 @@ void logr_log_tmp(char *msg, ...);
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "active=%d", (msg)->active);                \
     logr_log(level, "Logger.h", "LOGR_LOG_DLG", "acc_ticks=%d", (msg)->acc_ticks)
 
+#define LOGR_LOG_GS_CELL(level, cell) \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "*********************");                    \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "*   GsCEL           *");                    \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "*********************");                    \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "tpage=%d", (cell)->tpage);                  \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "flag=%d", (cell)->flag);                    \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "u=%d", (cell)->u);                          \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "v=%d", (cell)->v);                          \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_CEL", "cba=%d", (cell)->cba)
+
+#define LOGR_LOG_GS_MAP(level, map) \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "*********************");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "*   GsMAP           *");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "*********************");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "ncellw=%d", (map)->ncellw);                \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "ncellh=%d", (map)->ncellh);                \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "cellw=%d", (map)->cellw);                  \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "cellh=%d", (map)->cellh);                  \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "base=%p", (map)->base);                    \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_MAP", "index=%p", (map)->index)
+
+#define LOGR_LOG_GS_BG(level, bg)  \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "*********************");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "*   GsBG            *");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "*********************");                   \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "attribute=%d", (bg)->attribute);           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "x=%d", (bg)->x);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "y=%d", (bg)->y);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "scrollx=%d", (bg)->scrollx);               \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "r=%d", (bg)->r);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "g=%d", (bg)->g);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "b=%d", (bg)->b);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "map=%p", (bg)->map);                       \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "mx=%d", (bg)->mx);                         \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "my=%d", (bg)->my);                         \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "scalex=%d", (bg)->scalex);                 \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "scaley=%d", (bg)->scaley);                 \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "rotate=%d", (bg)->rotate);                 \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "w=%d", (bg)->w);                           \
+    logr_log(level, "Logger.h", "LOGR_LOG_GS_BG", "h=%d", (bg)->h)
 
 #endif // PSX_LOGGER_H
